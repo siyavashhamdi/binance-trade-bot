@@ -39,7 +39,9 @@ const bootstrap = async () => {
     //     }
     // });
 
-    const res = [];
+    let samplingPrice = [];
+    let nextMin = null;
+    let isMinStartedFromZero = false;
     binance.websockets.candlesticks(['DOGEUSDT'], "1m", (candlesticks) => {
         // let { e: eventType, E: eventTime, s: symbol, k: ticks } = candlesticks;
         // let { o: open, h: high, l: low, c: close, v: volume, n: trades, i: interval, x: isFinal, q: quoteVolume, V: buyVolume, Q: quoteBuyVolume } = ticks;
@@ -51,32 +53,54 @@ const bootstrap = async () => {
         // console.info("volume: " + volume);
         // console.info("isFinal: " + isFinal);
 
-        res.push(candlesticks.k.c);
+        const [formattedTime, dtMultiPart] = timestamp2time(candlesticks.E);
+        const highMinusLow = candlesticks.k.h - candlesticks.k.l;
 
-        if (res.length > 10)
-            res.shift();
+        if (nextMin === null) {
+            nextMin = dtMultiPart.m + 1;
+        }
 
-        console.error({ [timestamp2time(candlesticks.E)]: candlesticks.k.c, avg: _.meanBy(res, r => r * 1) });
+        if (nextMin >= 60) {
+            nextMin = 0;
+        }
 
+        if (dtMultiPart.m === nextMin) {
+            nextMin = dtMultiPart.m + 1;
+            samplingPrice = [];
+            isMinStartedFromZero = true;
+        }
+
+        samplingPrice.push(candlesticks.k.c);
+
+        console.error({
+            formattedTime,
+            price: candlesticks.k.c,
+            cnt: samplingPrice.length,
+            avg: _.meanBy(samplingPrice, r => r * 1),
+            isMinStartedFromZero,
+            nextMin,
+            highMinusLow,
+        });
     });
 
     const timestamp2time = (unix_timestamp) => {
         // Create a new JavaScript Date object based on the timestamp
         // multiplied by 1000 so that the argument is in milliseconds, not seconds.
-        var date = new Date(unix_timestamp);
+        const date = new Date(unix_timestamp);
 
-        var y = date.getFullYear();
-        var M = date.getMonth() + 1;
-        var d = date.getDate();
-        var H = date.getHours();
-        var m = date.getMinutes();
-        var s = date.getSeconds();
-        var ms = date.getMilliseconds();
+        const y = date.getFullYear();
+        const M = date.getMonth() + 1;
+        const d = date.getDate();
+        const H = date.getHours();
+        const m = date.getMinutes();
+        const s = date.getSeconds();
+        const ms = date.getMilliseconds();
 
         // Will display time in 10:30:23 format
-        var formattedTime = `${y}/${M}/${d}-${H}:${m}:${s}.${ms}`;
+        const formattedTime = `${ y }/${ M }/${ d }-${ H }:${ m }:${ s }.${ ms }`;
+        const dtMultiPart = { y, M, d, H, m, s, ms };
 
-        return formattedTime;
+        return [formattedTime, dtMultiPart];
     }
 }
 
