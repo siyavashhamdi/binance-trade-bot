@@ -1,7 +1,0 @@
-node_modules
-.idea
-dist
-.nyc_output
-.nyc_*.log
-coverage
-testing.ts
