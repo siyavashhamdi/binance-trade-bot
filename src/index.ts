@@ -3,11 +3,21 @@
 import { TradeInfo } from './helper/trade';
 
 const bootstrap = async () => {
-  const tradeInfo = new TradeInfo('ETH', 'BTC');
+  const tradeInfoEthBtc = new TradeInfo('ETH', 'BTC');
 
-  const res = await tradeInfo.calculate(12, 1);
+  const res = await tradeInfoEthBtc.calculate(10, 1);
 
   console.log({ res });
 }
 
-bootstrap();
+const runner = async () => {
+  console.log('Started');
+  console.time();
+
+  await bootstrap();
+
+  console.log('Finished');
+  console.timeEnd();
+}
+
+runner();
