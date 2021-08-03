@@ -1,22 +1,34 @@
+/* eslint-disable no-constant-condition */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 
 import { TradeInfo } from './helper/trade';
+import utils from './helper/utils';
 
 const bootstrap = async () => {
-  const tradeInfoEthBtc = new TradeInfo('ETH', 'BTC');
+  const tradeInfoEthBtc = new TradeInfo('ETH', 'USDT');
+  let tryNum = 0;
 
-  const res = await tradeInfoEthBtc.calculate(10, 1);
+  while (true) {
+    try {
+      utils.log(`Try #${ ++tryNum }`);
 
-  console.log({ res });
+      const res2 = await tradeInfoEthBtc.calculate(10, 0.2);
+
+      utils.log({ res2 });
+      break;
+    } catch (err) {
+      utils.log(`ERROR!\n${ err }`);
+    }
+  }
 }
 
 const runner = async () => {
-  console.log('Started');
+  utils.log('Started');
   console.time();
 
   await bootstrap();
 
-  console.log('Finished');
+  utils.log('Finished');
   console.timeEnd();
 }
 

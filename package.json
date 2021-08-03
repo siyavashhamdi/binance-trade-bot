@@ -23,7 +23,6 @@
     "typescript": "4.1.5"
   },
   "dependencies": {
-    "lodash": "^4.17.21",
     "node-binance-api": "^0.12.5"
   }
 }

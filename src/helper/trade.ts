@@ -1,31 +1,47 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-var-requires */
 
+import utils from './utils';
+
 export interface CalcResult {
-    date: Date,
-    cryptoPair: string,
-    investAmountByUsdt: number,
-    investAmountBySrc: number,
-    priceToBuy: number,
-    breakEvenToSell: number,
-    priceToSell: number,
+    baseInfo: {
+        date: Date,
+        cryptoPair: string,
+        desiredProfitPercentage: number,
+        investAmountByUsdt: number,
+        investAmountByDst: number,
+        fees: number,
+        breakEvenToSell: number,
+    },
+
+    tradeInfo: {
+        priceToBuy: number,
+        investAmountBySrc: number,
+        priceToSell: number,
+    },
+}
+
+export enum CryptoSide {
+    source = 'source',
+    destination = 'destination',
 }
 
 export class TradeInfo {
-    constructor(srcCryptoPair: string, dstCryptoParir: string) {
+    constructor(srcCryptoPair: string, dstCryptoPair: string, sideToIncrease: CryptoSide = CryptoSide.destination) {
         this.cryptoPair = {
-            complete: `${ srcCryptoPair }${ dstCryptoParir }`,
-            src: this.srcCryptoPair = srcCryptoPair,
-            dst: this.dstCryptoPair = dstCryptoParir,
+            complete: `${ srcCryptoPair }${ dstCryptoPair }`,
+            src: srcCryptoPair,
+            dst: dstCryptoPair,
         }
+
+        this.sideToIncrease = sideToIncrease;
 
         const Binance = require('node-binance-api');
         this.binanceApi = new Binance();
     }
 
     private cryptoPair: { complete: string, src: string, dst: string };
-    private srcCryptoPair: string;
-    private dstCryptoPair: string;
+    private sideToIncrease: CryptoSide;
     private binanceApi: any;
 
     private async getBestPriceToBuySrc(): Promise<number> {
@@ -41,54 +57,76 @@ export class TradeInfo {
 
     private async convertUsdt2Src(amountByUsdt: number): Promise<number> {
         const ticker = await this.binanceApi.prices();
-        const srcUsdtPair = `${ this.srcCryptoPair }USDT`;
+        const srcUsdtPair = `${ this.cryptoPair.src }USDT`;
         const currSrcUsdtPrice = ticker[srcUsdtPair];
 
         return amountByUsdt / currSrcUsdtPrice;
     }
 
-    private calcFee(priceToBuy: number): number {
-        return priceToBuy * 0.00075 * 2;
+    private async convertUsdt2Dst(amountByUsdt: number): Promise<number> {
+        if (this.cryptoPair.dst === 'USDT') {
+            return amountByUsdt;
+        }
+
+        const ticker = await this.binanceApi.prices();
+        const dstUsdtPair = `${ this.cryptoPair.dst }USDT`;
+        const currDstUsdtPrice = ticker[dstUsdtPair];
+
+        return amountByUsdt / currDstUsdtPrice;
     }
 
-    private calcSellBreakEven(priceToBuy: number) {
-        const fee = this.calcFee(priceToBuy);
+    private calcFee(investAmountByDst: number, desiredProfitPercentage: number): number {
+        const buyFee = investAmountByDst * 0.00075;
 
-        console.log({ SL: 2, priceToBuy, fee });
+        const percentageCoeff = 1 + (desiredProfitPercentage / 100);
+        const sellFee = investAmountByDst * percentageCoeff * 0.00075;
 
-        return priceToBuy - fee;
+        return buyFee + sellFee;
+    }
+
+    private calcSellBreakEven(priceToBuy: number, fees: number, investAmountByDst: number) {
+        return priceToBuy + ((fees * priceToBuy) / investAmountByDst);
     }
 
     private calcSellSrcPrice(breakEvenToSell: number, desiredProfitPercentage: number) {
-        const percentageCoeff = 1 - (desiredProfitPercentage / 100);
-
+        const percentageCoeff = 1 + (desiredProfitPercentage / 100);
         return breakEvenToSell * percentageCoeff;
     }
 
     public async calculate(investAmountByUsdt: number, desiredProfitPercentage: number): Promise<CalcResult> {
-        // Buy
         const isTimeToBuy = this.isTimeToBuy();
-        console.log({ SL: 1, isTimeToBuy });
+        utils.log({ SL: 1, isTimeToBuy });
 
         if (!isTimeToBuy) {
             throw new Error('It is not a good time to buy!');
         }
 
-        const investAmountBySrc = await this.convertUsdt2Src(investAmountByUsdt);
+        // Buy
         const priceToBuy = await this.getBestPriceToBuySrc();
+        const investAmountBySrc = await this.convertUsdt2Src(investAmountByUsdt);
+        const investAmountByDst = await this.convertUsdt2Dst(investAmountByUsdt);
 
         // Sell
-        const breakEvenToSell = this.calcSellBreakEven(priceToBuy);
+        const fees = this.calcFee(investAmountByDst, desiredProfitPercentage);
+        const breakEvenToSell = this.calcSellBreakEven(priceToBuy, fees, investAmountByDst);
         const priceToSell = this.calcSellSrcPrice(breakEvenToSell, desiredProfitPercentage);
 
         return {
-            date: new Date(),
-            cryptoPair: this.cryptoPair.complete,
-            investAmountByUsdt,
-            investAmountBySrc,
-            priceToBuy,
-            breakEvenToSell,
-            priceToSell,
+            baseInfo: {
+                date: new Date(),
+                cryptoPair: this.cryptoPair.complete,
+                desiredProfitPercentage,
+                investAmountByUsdt,
+                investAmountByDst,
+                fees,
+                breakEvenToSell,
+            },
+
+            tradeInfo: {
+                priceToBuy,
+                investAmountBySrc,
+                priceToSell,
+            },
         };
     }
 }

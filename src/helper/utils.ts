@@ -19,6 +19,14 @@ const ts2dt = (unixTs: number) => {
     return { formattedTime, dtMultiPart };
 }
 
+const log = (logValue: unknown): void => {
+    // const dateTime = new Date();
+    // const modifiedLogValue= `[${ dateTime }] : ${ logValue }`;
+
+    console.log(logValue);
+}
+
 export default {
     ts2dt,
+    log,
 };
