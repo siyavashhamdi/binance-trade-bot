@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-var-requires */
 
+import axios from 'axios';
 import utils from './utils';
 
 export interface CalcResult {
@@ -20,6 +21,15 @@ export interface CalcResult {
         investAmountBySrc: number,
         priceToSell: number,
     },
+}
+
+export interface CandlestickData {
+    dateTime: number,
+    dateTimeHuman: string,
+    open: number,
+    high: number,
+    low: number,
+    close: number,
 }
 
 export enum CryptoSide {
@@ -107,6 +117,20 @@ export class TradeInfo {
         });
     }
 
+    public async getCandlestickHistories(interval = '1m', limit: 10): Promise<Array<CandlestickData>> {
+        const url = `https://api.binance.com/api/v3/klines?symbol=${ this.cryptoPair.complete }&interval=${ interval }&limit=${ limit }`;
+        const response = await axios.get(url);
+
+        return response.data.map((item: number[]) => ({
+            dateTime: item[0],
+            dateTimeHuman: utils.ts2dt(item[0]),
+            open: +item[1],
+            high: +item[2],
+            low: +item[3],
+            close: +item[4],
+        }));
+    }
+
     public async calculate(investAmountByUsdt: number, desiredProfitPercentage: number): Promise<CalcResult> {
         const isTimeToBuy = this.isTimeToBuy();
         utils.log({ SL: 1, isTimeToBuy });
@@ -144,6 +168,14 @@ export class TradeInfo {
         };
     }
 
+    public async buyMarket(amountBySrc: number): Promise<number> {
+        return 0;
+    }
+
+    public async sellLimit(amountBySrc: number, priceToSell: number): Promise<number> {
+        return 0;
+    }
+
     public async test(): Promise<void> {
         // const ticker = await this.binanceApi.prices();
         // const res = ticker[this.cryptoPair.complete] * 1;
@@ -161,8 +193,11 @@ export class TradeInfo {
         //     console.log(candleStickInfo);
         // });
 
-        await this.binanceApi.websockets.candlesticks(this.cryptoPair.complete, '1m', (candleStick: any) => {
-            console.log(candleStick)
-        })
+        // await this.binanceApi.websockets.candlesticks(this.cryptoPair.complete, '1m', (candlestick: any) => {
+        //     console.log(candlestick)
+        // })
+
+        const res = await this.getCandlestickHistories('1m', 10);
+        console.log(res);
     }
 }
