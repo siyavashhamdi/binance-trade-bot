@@ -1,22 +1,13 @@
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-const ts2dt = (unixTs: number) => {
-    // Create a new JavaScript Date object based on the timestamp
-    // multiplied by 1000 so that the argument is in milliseconds, not seconds.
-    const date = new Date(unixTs);
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
-    const y = date.getFullYear();
-    const M = date.getMonth() + 1;
-    const d = date.getDate();
-    const H = date.getHours();
-    const m = date.getMinutes();
-    const s = date.getSeconds();
-    const ms = date.getMilliseconds();
+import moment from 'moment-timezone';
 
-    // Will display time in 10:30:23 format
-    const formattedTime = `${ y }/${ M }/${ d }-${ H }:${ m }:${ s }.${ ms }`;
-    const dtMultiPart = { y, M, d, H, m, s, ms };
+const zeroPad = (num: unknown, places: number): string => String(num).padStart(places, '0')
 
-    return { formattedTime, dtMultiPart };
+const ts2dt = (unixTs: number, timezone = 'Asia/Tehran'): string => {
+    const date = moment(unixTs).tz(timezone);
+
+    return date.format('yyyy/MM/DD HH:mm:ss.SSS');
 }
 
 const log = (logValue: unknown): void => {
@@ -27,6 +18,7 @@ const log = (logValue: unknown): void => {
 }
 
 export default {
+    zeroPad,
     ts2dt,
     log,
 };

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-var-requires */
 
@@ -46,7 +47,7 @@ export class TradeInfo {
 
     private async getBestPriceToBuySrc(): Promise<number> {
         // The main algorithm comes here
-        const ticker = await this.binanceApi.prices();
+        const ticker = await this.binanceApi.prices(this.cryptoPair.complete);
 
         return ticker[this.cryptoPair.complete] * 1;
     }
@@ -93,6 +94,19 @@ export class TradeInfo {
         return breakEvenToSell * percentageCoeff;
     }
 
+    public async streamTicker(callback: (candleStickInfo: any) => void) {
+        await this.binanceApi.websockets.miniTicker((tickers: any) => {
+            const ticker = tickers[this.cryptoPair.complete];
+
+            if (ticker && callback) {
+                callback({
+                    ...ticker,
+                    eventTimeHuman: utils.ts2dt(ticker.eventTime),
+                });
+            }
+        });
+    }
+
     public async calculate(investAmountByUsdt: number, desiredProfitPercentage: number): Promise<CalcResult> {
         const isTimeToBuy = this.isTimeToBuy();
         utils.log({ SL: 1, isTimeToBuy });
@@ -131,9 +145,24 @@ export class TradeInfo {
     }
 
     public async test(): Promise<void> {
-        const ticker = await this.binanceApi.prices();
-        const res = ticker[this.cryptoPair.complete] * 1;
+        // const ticker = await this.binanceApi.prices();
+        // const res = ticker[this.cryptoPair.complete] * 1;
 
-        console.log(res);
+        // console.log(res);
+
+        // console.log(this.binanceApi.websockets.miniTicker.toString());
+
+        // await this.binanceApi.websockets.miniTicker((tickers: any) => {
+        //     console.log(tickers.BTCUSDT)
+        // });
+        // return;
+
+        // this.streamTicker((candleStickInfo) => {
+        //     console.log(candleStickInfo);
+        // });
+
+        await this.binanceApi.websockets.candlesticks(this.cryptoPair.complete, '1m', (candleStick: any) => {
+            console.log(candleStick)
+        })
     }
 }

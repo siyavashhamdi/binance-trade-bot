@@ -15,7 +15,7 @@ const bootstrap = async () => {
       // const res = await tradeInfoEthBtc.calculate(10, 0.2);
       // utils.log({ res });
 
-      tradeInfoEthBtc.test();
+      await tradeInfoEthBtc.test();
       break;
     } catch (err) {
       utils.log(`ERROR!\n${ err }`);
