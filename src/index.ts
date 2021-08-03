@@ -5,16 +5,17 @@ import { TradeInfo } from './helper/trade';
 import utils from './helper/utils';
 
 const bootstrap = async () => {
-  const tradeInfoEthBtc = new TradeInfo('ETH', 'USDT');
+  const tradeInfoEthBtc = new TradeInfo('ETH', 'BTC');
   let tryNum = 0;
 
   while (true) {
     try {
       utils.log(`Try #${ ++tryNum }`);
 
-      const res2 = await tradeInfoEthBtc.calculate(10, 0.2);
+      // const res = await tradeInfoEthBtc.calculate(10, 0.2);
+      // utils.log({ res });
 
-      utils.log({ res2 });
+      tradeInfoEthBtc.test();
       break;
     } catch (err) {
       utils.log(`ERROR!\n${ err }`);

@@ -129,4 +129,11 @@ export class TradeInfo {
             },
         };
     }
+
+    public async test(): Promise<void> {
+        const ticker = await this.binanceApi.prices();
+        const res = ticker[this.cryptoPair.complete] * 1;
+
+        console.log(res);
+    }
 }
