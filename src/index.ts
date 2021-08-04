@@ -36,7 +36,7 @@ const bootstrap = async () => {
     } catch (err) {
       utils.log(JSON.stringify({ err }));
     }
-  }, 1000);
+  }, 5000);
 }
 
 const runner = async () => {
