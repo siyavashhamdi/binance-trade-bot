@@ -30,6 +30,13 @@ export interface CandlestickData {
     high: number,
     low: number,
     close: number,
+    type: CandlestickType,
+}
+
+export interface TradenfoOptions {
+    cryptoSide?: CryptoSide,
+    apiKey?: string,
+    apiSecret?: string,
 }
 
 export enum CryptoSide {
@@ -37,10 +44,9 @@ export enum CryptoSide {
     destination = 'destination',
 }
 
-export interface TradenfoOptions {
-    cryptoSide?: CryptoSide,
-    apiKey?: string,
-    apiSecret?: string,
+export enum CandlestickType {
+    bullish = 'bullish',
+    bearish = 'bearish',
 }
 
 export class TradeInfo {
@@ -62,6 +68,8 @@ export class TradeInfo {
 
         this.binanceApi = new Binance();
         this.binanceApiAuth = new Binance().options({ APIKEY: this.options.apiKey, APISECRET: this.options.apiSecret });
+
+        this.nextCheckBuy = new Date();
     }
 
     private cryptoPair: { complete: string, src: string, dst: string };
@@ -70,6 +78,8 @@ export class TradeInfo {
     private binanceApi: any;
     private binanceApiAuth: any;
 
+    private nextCheckBuy: Date;
+
     private async getBestPriceToBuySrc(): Promise<number> {
         // The main algorithm comes here
         const ticker = await this.binanceApi.prices(this.cryptoPair.complete);
@@ -77,7 +87,32 @@ export class TradeInfo {
         return ticker[this.cryptoPair.complete] * 1;
     }
 
-    private isTimeToBuy(): boolean {
+    private async isTimeToBuy(samplingCount = 5): Promise<boolean> {
+        const isTimeReached = this.nextCheckBuy < new Date();
+
+        if (!isTimeReached) {
+            return false;
+        }
+
+        const SamplingCount80Percent = samplingCount * 0.8;
+        const csHistories = await this.getCandlestickHistories('5m', samplingCount);
+        const bullishCount = csHistories.filter(item => item.type === CandlestickType.bullish).length;
+
+        console.log({ samplingCount, SamplingCount80Percent, bullishCount, csHistories });
+
+        // At least 80% of sampling must be bullish
+        if (bullishCount < SamplingCount80Percent) {
+            return false;
+        }
+
+        const isBearishFoundInLasts =
+            csHistories[samplingCount - 2].type === CandlestickType.bearish ||
+            csHistories[samplingCount - 1].type === CandlestickType.bearish;
+
+        if (isBearishFoundInLasts) {
+            return false
+        }
+
         return true;
     }
 
@@ -132,7 +167,7 @@ export class TradeInfo {
         });
     }
 
-    private async getCandlestickHistories(interval = '1m', limit: 10): Promise<Array<CandlestickData>> {
+    private async getCandlestickHistories(interval = '1m', limit = 10): Promise<Array<CandlestickData>> {
         const url = `https://api.binance.com/api/v3/klines?symbol=${ this.cryptoPair.complete }&interval=${ interval }&limit=${ limit }`;
         const response = await axios.get(url);
 
@@ -143,11 +178,12 @@ export class TradeInfo {
             high: +item[2],
             low: +item[3],
             close: +item[4],
+            type: (+item[1]) - (+item[4]) <= 0 ? CandlestickType.bullish : CandlestickType.bearish,
         }));
     }
 
     public async calculate(investAmountByUsdt: number, desiredProfitPercentage: number): Promise<CalcResult> {
-        const isTimeToBuy = this.isTimeToBuy();
+        const isTimeToBuy = await this.isTimeToBuy();
         utils.log({ SL: 1, isTimeToBuy });
 
         if (!isTimeToBuy) {
@@ -215,28 +251,35 @@ export class TradeInfo {
         // })
 
         // const res = await this.getCandlestickHistories('1m', 10);
-        // console.log(res);
+        // console.log(res);        
 
-        const resBuy = await this.buyMarket(objInput.priceToBuy);
-        console.log({ SL: 1, resBuy, fills: resBuy.fills });
+        const isTimeToBuy = await this.isTimeToBuy();
+        console.log({ isTimeToBuy });
 
-        if (resBuy?.status === 'FILLED') {
-            // Buy
-            const priceToBuy = +resBuy.fills[0].price;
-            const investAmountByDst = +resBuy.cummulativeQuoteQty;
+        if (isTimeToBuy) {
+            this.nextCheckBuy = utils.addSecondsToDate(this.nextCheckBuy, 6 * 60);  // The next buy/sell after at least 6 minutes
 
-            // Sell
-            const fees = this.calcFee(investAmountByDst, objInput.desiredProfitPercentage);
-            const breakEvenToSell = this.calcSellBreakEven(priceToBuy, fees, investAmountByDst);
-            const priceToSell = this.calcSellSrcPrice(breakEvenToSell, objInput.desiredProfitPercentage);
+            const resBuy = await this.buyMarket(objInput.priceToBuy);
+            console.log({ SL: 1, resBuy, fills: resBuy.fills });
 
-            console.log({ SL: 2, objInput, priceToBuy, investAmountByDst, fees, breakEvenToSell, priceToSell });
+            if (resBuy?.status === 'FILLED') {
+                // Buy
+                const priceToBuy = +resBuy.fills[0].price;
+                const investAmountByDst = +resBuy.cummulativeQuoteQty;
 
-            const resSell = await this.sellLimit(objInput.priceToBuy, priceToSell);
+                // Sell
+                const fees = this.calcFee(investAmountByDst, objInput.desiredProfitPercentage);
+                const breakEvenToSell = this.calcSellBreakEven(priceToBuy, fees, investAmountByDst);
+                const priceToSell = this.calcSellSrcPrice(breakEvenToSell, objInput.desiredProfitPercentage);
 
-            console.log({ SL: 3, resSell });
-        } else {
-            throw new Error('Buy status is not Filled!');
+                console.log({ SL: 2, objInput, priceToBuy, investAmountByDst, fees, breakEvenToSell, priceToSell });
+
+                const resSell = await this.sellLimit(objInput.priceToBuy, priceToSell);
+
+                console.log({ SL: 3, resSell });
+            } else {
+                throw new Error('Buy status is not Filled!');
+            }
         }
     }
 }

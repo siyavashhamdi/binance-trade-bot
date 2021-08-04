@@ -10,6 +10,13 @@ const ts2dt = (unixTs: number, timezone = 'Asia/Tehran'): string => {
     return date.format('yyyy/MM/DD HH:mm:ss.SSS');
 }
 
+
+const addSecondsToDate = (date: Date, seconds: number): Date => {
+    const addedDate = moment(date).add(seconds, 's');
+
+    return addedDate.toDate();
+}
+
 const log = (logValue: unknown): void => {
     // const dateTime = new Date();
     // const modifiedLogValue= `[${ dateTime }] : ${ logValue }`;
@@ -20,5 +27,6 @@ const log = (logValue: unknown): void => {
 export default {
     zeroPad,
     ts2dt,
+    addSecondsToDate,
     log,
 };
