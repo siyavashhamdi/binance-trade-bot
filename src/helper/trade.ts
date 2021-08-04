@@ -119,7 +119,7 @@ export class TradeInfo {
         return breakEvenToSell * percentageCoeff;
     }
 
-    public async streamTicker(callback: (candleStickInfo: any) => void) {
+    private async streamTicker(callback: (candleStickInfo: any) => void) {
         await this.binanceApi.websockets.miniTicker((tickers: any) => {
             const ticker = tickers[this.cryptoPair.complete];
 
@@ -132,7 +132,7 @@ export class TradeInfo {
         });
     }
 
-    public async getCandlestickHistories(interval = '1m', limit: 10): Promise<Array<CandlestickData>> {
+    private async getCandlestickHistories(interval = '1m', limit: 10): Promise<Array<CandlestickData>> {
         const url = `https://api.binance.com/api/v3/klines?symbol=${ this.cryptoPair.complete }&interval=${ interval }&limit=${ limit }`;
         const response = await axios.get(url);
 
@@ -183,15 +183,15 @@ export class TradeInfo {
         };
     }
 
-    public async buyMarket(amountBySrc: number) {
+    private async buyMarket(amountBySrc: number) {
         return await this.binanceApiAuth.marketBuy(this.cryptoPair.complete, amountBySrc);
     }
 
-    public async sellLimit(amountBySrc: number, priceToSell: number) {
+    private async sellLimit(amountBySrc: number, priceToSell: number) {
         return await this.binanceApiAuth.sell(this.cryptoPair.complete, amountBySrc, priceToSell);
     }
 
-    public async test(): Promise<void> {
+    public async test(objInput: any): Promise<void> {
         // const ticker = await this.binanceApi.prices();
         // const res = ticker[this.cryptoPair.complete] * 1;
 
@@ -212,7 +212,29 @@ export class TradeInfo {
         //     console.log(candlestick)
         // })
 
-        const res = await this.getCandlestickHistories('1m', 10);
-        console.log(res);
+        // const res = await this.getCandlestickHistories('1m', 10);
+        // console.log(res);
+
+        const resBuy = await this.buyMarket(objInput.priceToBuy);
+        console.log({ SL: 1, resBuy });
+
+        if (resBuy?.status === 'FILLED') {
+            // Buy
+            const priceToBuy = resBuy.fills[0].price;
+            const investAmountByDst = resBuy.cummulativeQuoteQty;
+
+            // Sell
+            const fees = this.calcFee(investAmountByDst, objInput.desiredProfitPercentage);
+            const breakEvenToSell = this.calcSellBreakEven(priceToBuy, fees, investAmountByDst);
+            const priceToSell = this.calcSellSrcPrice(breakEvenToSell, objInput.desiredProfitPercentage);
+
+            console.log({ SL: 2, objInput, priceToBuy, investAmountByDst, fees, breakEvenToSell, priceToSell });
+
+            const resSell = await this.sellLimit(objInput.priceToBuy, priceToSell);
+
+            console.log({ SL: 3, resSell });
+        } else {
+            throw new Error('Buy status is not Filled!');
+        }
     }
 }
