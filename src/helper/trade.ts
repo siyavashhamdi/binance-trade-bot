@@ -188,7 +188,9 @@ export class TradeInfo {
     }
 
     private async sellLimit(amountBySrc: number, priceToSell: number) {
-        return await this.binanceApiAuth.sell(this.cryptoPair.complete, amountBySrc, priceToSell);
+        const fixedNum = 6;
+
+        return await this.binanceApiAuth.sell(this.cryptoPair.complete, amountBySrc, priceToSell.toFixed(fixedNum));
     }
 
     public async test(objInput: any): Promise<void> {
