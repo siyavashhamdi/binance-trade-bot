@@ -23,6 +23,7 @@ const bootstrap = async () => {
       break;
     } catch (err) {
       utils.log(`ERROR!\n${ JSON.stringify({ err }) }`);
+      break;
     }
   }
 }
