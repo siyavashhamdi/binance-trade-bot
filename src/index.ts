@@ -1,26 +1,23 @@
 /* eslint-disable no-constant-condition */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 
-import { TradeInfo } from './helper/trade';
+import { CryptoSide, TradeInfo } from './helper/trade';
 import utils from './helper/utils';
 import dotenv from 'dotenv';
 
 const bootstrap = async () => {
   dotenv.config({ path: 'src/config/.env' });
 
-  const tradeInfoEthBtc = new TradeInfo('ETH', 'BTC');
+  const tradeInfoEthBtc = new TradeInfo('ETH', 'BTC', { apiKey: process.env.BNC_API_KEY, apiSecret: process.env.BNC_API_SECRET });
   let tryNum = 0;
 
   while (true) {
     try {
       utils.log(`Try #${ ++tryNum }`);
 
-      // const res = await tradeInfoEthBtc.calculate(5.2, 0.05);
-      // utils.log({ res });
+      const resBuy = await tradeInfoEthBtc.buyMarket(0.002);  // Buy 0.002 ETH
+      console.log({ resBuy });
 
-      console.log(process.env.BNC_API);
-
-      // await tradeInfoEthBtc.test();
       break;
     } catch (err) {
       utils.log(`ERROR!\n${ err }`);

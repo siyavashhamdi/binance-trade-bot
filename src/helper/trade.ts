@@ -37,26 +37,36 @@ export enum CryptoSide {
     destination = 'destination',
 }
 
+export interface TradenfoOptions {
+    cryptoSide?: CryptoSide,
+    apiKey?: string,
+    apiSecret?: string,
+}
+
 export class TradeInfo {
-    constructor(srcCryptoPair: string, dstCryptoPair: string, sideToIncrease: CryptoSide = CryptoSide.destination) {
+    constructor(srcCryptoPair: string, dstCryptoPair: string, options: TradenfoOptions) {
         this.cryptoPair = {
             complete: `${ srcCryptoPair }${ dstCryptoPair }`,
             src: srcCryptoPair,
             dst: dstCryptoPair,
         }
 
-        this.sideToIncrease = sideToIncrease;
+        this.options = {
+            ...options,
+            cryptoSide: options.cryptoSide || CryptoSide.destination,
+        };
 
         const Binance = require('node-binance-api');
 
-        console.log(process.env.BNC_API);
+        console.log({ options });
 
         this.binanceApi = new Binance();
-        this.binanceApiAuth = new Binance().options({ APIKEY: process.env.BNC_API_KEY, APISECRET: process.env.BNC_API_SECRET });
+        this.binanceApiAuth = new Binance().options({ APIKEY: this.options.apiKey, APISECRET: this.options.apiSecret });
     }
 
     private cryptoPair: { complete: string, src: string, dst: string };
-    private sideToIncrease: CryptoSide;
+    private options: TradenfoOptions;
+
     private binanceApi: any;
     private binanceApiAuth: any;
 
@@ -173,11 +183,11 @@ export class TradeInfo {
         };
     }
 
-    public async buyMarket(amountBySrc: number): Promise<number> {
+    public async buyMarket(amountBySrc: number) {
         return await this.binanceApiAuth.marketBuy(this.cryptoPair.complete, amountBySrc);
     }
 
-    public async sellLimit(amountBySrc: number, priceToSell: number): Promise<number> {
+    public async sellLimit(amountBySrc: number, priceToSell: number) {
         return await this.binanceApiAuth.sell(this.cryptoPair.complete, amountBySrc, priceToSell);
     }
 
