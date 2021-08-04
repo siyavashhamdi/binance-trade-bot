@@ -15,8 +15,8 @@ const bootstrap = async () => {
     try {
       utils.log(`Try #${ ++tryNum }`);
 
-      const resBuy = await tradeInfoEthBtc.buyMarket(0.002);  // Buy 0.002 ETH
-      console.log({ resBuy });
+      const resBuy = await tradeInfoEthBtc.buyMarket(0.0011);  // Buy 0.002 ETH
+      console.log({ resBuy, fills: resBuy.fills });
 
       break;
     } catch (err) {
