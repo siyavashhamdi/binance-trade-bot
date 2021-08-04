@@ -216,7 +216,7 @@ export class TradeInfo {
         // console.log(res);
 
         const resBuy = await this.buyMarket(objInput.priceToBuy);
-        console.log({ SL: 1, resBuy });
+        console.log({ SL: 1, resBuy, fills: resBuy.fills });
 
         if (resBuy?.status === 'FILLED') {
             // Buy
