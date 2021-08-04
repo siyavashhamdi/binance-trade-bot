@@ -3,8 +3,11 @@
 
 import { TradeInfo } from './helper/trade';
 import utils from './helper/utils';
+import dotenv from 'dotenv';
 
 const bootstrap = async () => {
+  dotenv.config({ path: 'src/config/.env' });
+
   const tradeInfoEthBtc = new TradeInfo('ETH', 'BTC');
   let tryNum = 0;
 
@@ -12,10 +15,12 @@ const bootstrap = async () => {
     try {
       utils.log(`Try #${ ++tryNum }`);
 
-      // const res = await tradeInfoEthBtc.calculate(10, 0.2);
+      // const res = await tradeInfoEthBtc.calculate(5.2, 0.05);
       // utils.log({ res });
 
-      await tradeInfoEthBtc.test();
+      console.log(process.env.BNC_API);
+
+      // await tradeInfoEthBtc.test();
       break;
     } catch (err) {
       utils.log(`ERROR!\n${ err }`);

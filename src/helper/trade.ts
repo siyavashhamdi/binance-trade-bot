@@ -48,12 +48,17 @@ export class TradeInfo {
         this.sideToIncrease = sideToIncrease;
 
         const Binance = require('node-binance-api');
+
+        console.log(process.env.BNC_API);
+
         this.binanceApi = new Binance();
+        this.binanceApiAuth = new Binance().options({ APIKEY: process.env.BNC_API_KEY, APISECRET: process.env.BNC_API_SECRET });
     }
 
     private cryptoPair: { complete: string, src: string, dst: string };
     private sideToIncrease: CryptoSide;
     private binanceApi: any;
+    private binanceApiAuth: any;
 
     private async getBestPriceToBuySrc(): Promise<number> {
         // The main algorithm comes here
@@ -140,7 +145,7 @@ export class TradeInfo {
         }
 
         // Buy
-        const priceToBuy = await this.getBestPriceToBuySrc();
+        const priceToBuy = 0.065405;//await this.getBestPriceToBuySrc();
         const investAmountBySrc = await this.convertUsdt2Src(investAmountByUsdt);
         const investAmountByDst = await this.convertUsdt2Dst(investAmountByUsdt);
 
@@ -169,11 +174,11 @@ export class TradeInfo {
     }
 
     public async buyMarket(amountBySrc: number): Promise<number> {
-        return 0;
+        return await this.binanceApiAuth.marketBuy(this.cryptoPair.complete, amountBySrc);
     }
 
     public async sellLimit(amountBySrc: number, priceToSell: number): Promise<number> {
-        return 0;
+        return await this.binanceApiAuth.sell(this.cryptoPair.complete, amountBySrc, priceToSell);
     }
 
     public async test(): Promise<void> {
