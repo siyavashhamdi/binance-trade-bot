@@ -220,8 +220,8 @@ export class TradeInfo {
 
         if (resBuy?.status === 'FILLED') {
             // Buy
-            const priceToBuy = resBuy.fills[0].price;
-            const investAmountByDst = resBuy.cummulativeQuoteQty;
+            const priceToBuy = +resBuy.fills[0].price;
+            const investAmountByDst = +resBuy.cummulativeQuoteQty;
 
             // Sell
             const fees = this.calcFee(investAmountByDst, objInput.desiredProfitPercentage);
