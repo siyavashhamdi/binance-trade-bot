@@ -41,7 +41,7 @@ export class TradeInfo {
     }
 
     private async checkTimeToBuy(samplingCount = 5): Promise<{ isRightTime: boolean, errMsg?: string }> {
-        // test
+        // test - temp to delete
         const csHistoriesX = await this.getCandlestickHistories('5m', samplingCount);
         const candlestickHightsX = csHistoriesX.map(item => Math.abs(item.high - item.low));
         const stdValX = std(candlestickHightsX);
@@ -79,15 +79,15 @@ export class TradeInfo {
             };
         }
 
-        const candlestickHights = csHistories.map(item => Math.abs(item.high - item.low));
-        const stdVal = std(candlestickHights);
+        // const candlestickHights = csHistories.map(item => Math.abs(item.high - item.low));
+        // const stdVal = std(candlestickHights);
 
-        if (stdVal > 50) {
-            return {
-                isRightTime: false,
-                errMsg: `Standard deviation is high. Current STD is ${ stdVal }`,
-            };
-        }
+        // if (stdVal > 50) {
+        //     return {
+        //         isRightTime: false,
+        //         errMsg: `Standard deviation is high. Current STD is ${ stdVal }`,
+        //     };
+        // }
 
         return {
             isRightTime: false,
