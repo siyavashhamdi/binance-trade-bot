@@ -1,8 +1,5 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 import axios from 'axios';
+import { std } from 'mathjs';
 import utils from './utils';
 import { CalcResult, TradenfoOptions, CandlestickData } from '../type';
 import { CryptoSide, CandlestickType } from '../enum';
@@ -44,6 +41,12 @@ export class TradeInfo {
     }
 
     private async checkTimeToBuy(samplingCount = 5): Promise<{ isRightTime: boolean, errMsg?: string }> {
+        // test
+        const csHistoriesX = await this.getCandlestickHistories('5m', samplingCount);
+        const candlestickHightsX = csHistoriesX.map(item => Math.abs(item.high - item.low));
+        const stdValX = std(candlestickHightsX);
+        utils.log(`STD: ${ stdValX }`);
+
         const isTimeReached = this.nextCheckBuy < new Date();
 
         console.log({ SL: 1, isTimeReached, ncb: this.nextCheckBuy, currentDt: new Date() })
@@ -75,6 +78,16 @@ export class TradeInfo {
             return {
                 isRightTime: false,
                 errMsg: 'Bearish found in last candlesticks!',
+            };
+        }
+
+        const candlestickHights = csHistories.map(item => Math.abs(item.high - item.low));
+        const stdVal = std(candlestickHights);
+
+        if (stdVal > 50) {
+            return {
+                isRightTime: false,
+                errMsg: `Standard deviation is high. Current STD is ${ stdVal }`,
             };
         }
 

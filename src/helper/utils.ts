@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-
 import moment from 'moment-timezone';
 
 const zeroPad = (num: unknown, places: number): string => String(num).padStart(places, '0')
@@ -17,7 +15,7 @@ const addSecondsToDate = (date: Date, seconds: number): Date => {
     return addedDate.toDate();
 }
 
-const log = (logValue: string): void => {
+const log = (logValue: string | number): void => {
     const dateTime = formatDateTime(new Date());
     const modifiedLogValue = `[${ dateTime }] : ${ logValue }`;
 
