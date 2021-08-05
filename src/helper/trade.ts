@@ -196,9 +196,9 @@ export class TradeInfo {
     }
 
     public async orderPlanA(objInput: any): Promise<void> {
-        const isTimeToBuy = await this.checkTimeToBuy();
+        const timeToBuyStatus = await this.checkTimeToBuy();
 
-        if (isTimeToBuy) {
+        if (timeToBuyStatus.isRightTime) {
             this.nextCheckBuy = utils.addSecondsToDate(new Date(), 6 * 60);  // The next buy/sell after at least 6 minutes
 
             const resBuy = await this.buyMarket(objInput.priceToBuy);
