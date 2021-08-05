@@ -7,7 +7,7 @@ const zeroPad = (num: unknown, places: number): string => String(num).padStart(p
 const formatDateTime = (dateTime: number | Date, timezone = 'Asia/Tehran'): string => {
     const unixTs = typeof dateTime === 'number' ? dateTime : dateTime.getDate();
 
-    console.log({ SL: 0, dateTime, timezone: new Date(), unixTs })
+    console.log({ SL: 0, dateTime, timezone: new Date(), unixTs, typeOf: typeof dateTime })
 
     const date = moment(unixTs).tz(timezone);
 
