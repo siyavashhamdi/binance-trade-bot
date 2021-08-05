@@ -89,6 +89,7 @@ export class TradeInfo {
 
     private async isTimeToBuy(samplingCount = 5): Promise<boolean> {
         const isTimeReached = this.nextCheckBuy < new Date();
+        utils.log(`isTimeReached: ${ isTimeReached } | ${ this.nextCheckBuy } < ${ new Date() }`);
 
         if (!isTimeReached) {
             utils.log(`Time is not reached: ${ this.nextCheckBuy } < ${ new Date() }`);
