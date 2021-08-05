@@ -70,8 +70,6 @@ export class TradeInfo {
             csHistories[samplingCount - 1].type === CandlestickType.bearish;
 
         if (isBearishFoundInLasts) {
-            utils.log(`Bearish found in last candlesticks!`);
-
             return {
                 isRightTime: false,
                 errMsg: 'Bearish found in last candlesticks!',

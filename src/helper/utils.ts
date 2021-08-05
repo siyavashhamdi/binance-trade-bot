@@ -21,7 +21,7 @@ const log = (logValue: unknown): void => {
     const dateTime = formatDateTime(new Date());
     const modifiedLogValue = `[${ dateTime }] : ${ logValue }`;
 
-    console.log(logValue);
+    console.log(modifiedLogValue);
 }
 
 export default {
