@@ -4,12 +4,12 @@ import moment from 'moment-timezone';
 
 const zeroPad = (num: unknown, places: number): string => String(num).padStart(places, '0')
 
-const ts2dt = (unixTs: number, timezone = 'Asia/Tehran'): string => {
+const formatDateTime = (dateTime: number | Date, timezone = 'Asia/Tehran'): string => {
+    const unixTs = typeof dateTime === 'number' ? dateTime : dateTime.getDate();
     const date = moment(unixTs).tz(timezone);
 
     return date.format('yyyy/MM/DD HH:mm:ss.SSS');
 }
-
 
 const addSecondsToDate = (date: Date, seconds: number): Date => {
     const addedDate = moment(date).add(seconds, 's');
@@ -18,15 +18,15 @@ const addSecondsToDate = (date: Date, seconds: number): Date => {
 }
 
 const log = (logValue: unknown): void => {
-    // const dateTime = new Date();
-    // const modifiedLogValue= `[${ dateTime }] : ${ logValue }`;
+    const dateTime = formatDateTime(new Date());
+    const modifiedLogValue = `[${ dateTime }] : ${ logValue }`;
 
     console.log(logValue);
 }
 
 export default {
     zeroPad,
-    ts2dt,
+    formatDateTime,
     addSecondsToDate,
     log,
 };

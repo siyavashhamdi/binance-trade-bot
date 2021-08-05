@@ -22,8 +22,6 @@ export class TradeInfo {
 
         const Binance = require('node-binance-api');
 
-        utils.log({ options });
-
         this.binanceApi = new Binance();
         this.binanceApiAuth = new Binance().options({ APIKEY: this.options.apiKey, APISECRET: this.options.apiSecret });
 
@@ -45,26 +43,26 @@ export class TradeInfo {
         return ticker[this.cryptoPair.complete] * 1;
     }
 
-    private async isTimeToBuy(samplingCount = 5): Promise<boolean> {
+    private async checkTimeToBuy(samplingCount = 5): Promise<{ isRightTime: boolean, errMsg?: string }> {
         const isTimeReached = this.nextCheckBuy < new Date();
-        utils.log(`isTimeReached: ${ isTimeReached } | ${ this.nextCheckBuy } < ${ new Date() }`);
 
         if (!isTimeReached) {
-            utils.log(`Time is not reached: ${ this.nextCheckBuy } < ${ new Date() }`);
-            return false;
+            return {
+                isRightTime: false,
+                errMsg: `Time is not reached: ${ utils.formatDateTime(this.nextCheckBuy) } < ${ utils.formatDateTime(new Date()) }`,
+            };
         }
 
         const SamplingCount80Percent = samplingCount * 0.8;
         const csHistories = await this.getCandlestickHistories('5m', samplingCount);
         const bullishCount = csHistories.filter(item => item.type === CandlestickType.bullish).length;
 
-        utils.log({ samplingCount, SamplingCount80Percent, bullishCount, csHistories });
-
         // At least 80% of sampling must be bullish
         if (bullishCount < SamplingCount80Percent) {
-            utils.log(`Sampling count is not satisfied: ${ bullishCount } < ${ SamplingCount80Percent }`);
-
-            return false;
+            return {
+                isRightTime: false,
+                errMsg: `Sampling count is not satisfied: ${ bullishCount } < ${ SamplingCount80Percent }`,
+            };
         }
 
         const isBearishFoundInLasts =
@@ -72,12 +70,17 @@ export class TradeInfo {
             csHistories[samplingCount - 1].type === CandlestickType.bearish;
 
         if (isBearishFoundInLasts) {
-            utils.log(`Bearish found in last candlesticks`);
+            utils.log(`Bearish found in last candlesticks!`);
 
-            return false
+            return {
+                isRightTime: false,
+                errMsg: 'Bearish found in last candlesticks!',
+            };
         }
 
-        return true;
+        return {
+            isRightTime: false,
+        };
     }
 
     private async convertUsdt2Src(amountByUsdt: number): Promise<number> {
@@ -125,7 +128,7 @@ export class TradeInfo {
             if (ticker && callback) {
                 callback({
                     ...ticker,
-                    eventTimeHuman: utils.ts2dt(ticker.eventTime),
+                    eventTimeHuman: utils.formatDateTime(ticker.eventTime),
                 });
             }
         });
@@ -137,7 +140,7 @@ export class TradeInfo {
 
         return response.data.map((item: number[]) => ({
             dateTime: item[0],
-            dateTimeHuman: utils.ts2dt(item[0]),
+            dateTimeHuman: utils.formatDateTime(item[0]),
             open: +item[1],
             high: +item[2],
             low: +item[3],
@@ -157,15 +160,14 @@ export class TradeInfo {
     }
 
     public async orderInstantBuySell(investAmountByUsdt: number, desiredProfitPercentage: number): Promise<CalcResult> {
-        const isTimeToBuy = await this.isTimeToBuy();
-        utils.log({ SL: 1, isTimeToBuy });
+        const timeToBuyStatus = await this.checkTimeToBuy();
 
-        if (!isTimeToBuy) {
-            throw new Error('It is not a good time to buy!');
+        if (!timeToBuyStatus.isRightTime) {
+            throw new Error(timeToBuyStatus.errMsg);
         }
 
         // Buy
-        const priceToBuy = 0.065405;//await this.getBestPriceToBuySrc();
+        const priceToBuy = await this.getBestPriceToBuySrc();
         const investAmountBySrc = await this.convertUsdt2Src(investAmountByUsdt);
         const investAmountByDst = await this.convertUsdt2Dst(investAmountByUsdt);
 
@@ -194,14 +196,14 @@ export class TradeInfo {
     }
 
     public async orderPlanA(objInput: any): Promise<void> {
-        const isTimeToBuy = await this.isTimeToBuy();
-        utils.log({ isTimeToBuy });
+        const isTimeToBuy = await this.checkTimeToBuy();
 
         if (isTimeToBuy) {
             this.nextCheckBuy = utils.addSecondsToDate(new Date(), 6 * 60);  // The next buy/sell after at least 6 minutes
 
             const resBuy = await this.buyMarket(objInput.priceToBuy);
-            utils.log({ SL: 1, resBuy, fills: resBuy.fills });
+
+            utils.log(`Market buy done on price ${ resBuy.fills[0].price }${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty }${ this.cryptoPair.src }`);
 
             if (resBuy?.status === 'FILLED') {
                 // Buy
@@ -213,13 +215,11 @@ export class TradeInfo {
                 const breakEvenToSell = this.calcSellBreakEven(priceToBuy, fees, investAmountByDst);
                 const priceToSell = this.calcSellSrcPrice(breakEvenToSell, objInput.desiredProfitPercentage);
 
-                utils.log({ SL: 2, objInput, priceToBuy, investAmountByDst, fees, breakEvenToSell, priceToSell });
-
                 const resSell = await this.sellLimit(objInput.priceToBuy, priceToSell);
 
-                utils.log({ SL: 3, resSell });
+                utils.log(`Sell order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
             } else {
-                throw new Error('Buy status is not Filled!');
+                utils.log('Buy status is not Filled!');
             }
         }
     }
