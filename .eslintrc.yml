@@ -1,0 +1,83 @@
+root: true
+
+extends:
+  - airbnb-typescript/base
+
+
+parser: '@typescript-eslint/parser'
+parserOptions:
+  project: './tsconfig.json'
+
+plugins:
+  - '@typescript-eslint'
+  - import
+
+settings:
+  import/resolver:
+    typescript:
+
+rules:
+  # Disabled for performance reasons
+  'import/no-cycle': off
+  'import/export': off
+  'import/order': off
+  'import/no-extraneous-dependencies': off
+  'import/prefer-default-export': off
+  '@typescript-eslint/no-use-before-define': off
+  '@typescript-eslint/no-unused-vars': off
+  '@typescript-eslint/no-for-in-array': off
+  '@typescript-eslint/no-unnecessary-qualifier': off
+  '@typescript-eslint/no-unnecessary-type-assertion': off
+  '@typescript-eslint/promise-function-async': off
+  '@typescript-eslint/restrict-plus-operands': off
+  '@typescript-eslint/no-implied-eval': off
+
+  '@typescript-eslint/indent': off
+  '@typescript-eslint/array-type': [error, { "default": "generic", "readonly": "generic" }]
+  default-case: off
+  '@typescript-eslint/switch-exhaustiveness-check': [error]
+  indent: [error, 2, { "SwitchCase": 1 }]
+  no-case-declarations: off
+  arrow-body-style: off
+
+  template-curly-spacing: [error, always]
+  no-restricted-syntax: off
+  class-methods-use-this: off
+  max-len: [warn, 140]
+  arrow-parens: [error, as-needed, { "requireForBlockBody": true }]
+  no-await-in-loop: off
+  no-underscore-dangle: [error, { "allow": ["_id"] }]
+  max-classes-per-file: off
+
+  object-curly-newline: [error, { "consistent": true }]
+  no-mixed-operators: [error, { "allowSamePrecedence": true }]
+  newline-per-chained-call: off
+  object-curly-spacing: [error, "always"]
+  object-property-newline: [error, { "allowAllPropertiesOnSameLine": true }]
+  no-trailing-spaces: error
+  function-call-argument-newline: [error, "consistent"]
+
+
+  padding-line-between-statements:
+    - error
+    - blankLine: always
+      prev: "*"
+      next: if
+    - blankLine: always
+      prev: "*"
+      next: return
+    - blankLine: always
+      prev: "*"
+      next: throw
+
+  comma-dangle: off
+  '@typescript-eslint/comma-dangle':
+    - error
+    - arrays: always-multiline
+      objects: always-multiline
+      imports: always-multiline
+      exports: always-multiline
+      functions: always-multiline
+      enums: always-multiline
+      generics: always-multiline
+      tuples: always-multiline

@@ -4,50 +4,8 @@
 
 import axios from 'axios';
 import utils from './utils';
-
-export interface CalcResult {
-    baseInfo: {
-        date: Date,
-        cryptoPair: string,
-        desiredProfitPercentage: number,
-        investAmountByUsdt: number,
-        investAmountByDst: number,
-        fees: number,
-        breakEvenToSell: number,
-    },
-
-    tradeInfo: {
-        priceToBuy: number,
-        investAmountBySrc: number,
-        priceToSell: number,
-    },
-}
-
-export interface CandlestickData {
-    dateTime: number,
-    dateTimeHuman: string,
-    open: number,
-    high: number,
-    low: number,
-    close: number,
-    type: CandlestickType,
-}
-
-export interface TradenfoOptions {
-    cryptoSide?: CryptoSide,
-    apiKey?: string,
-    apiSecret?: string,
-}
-
-export enum CryptoSide {
-    source = 'source',
-    destination = 'destination',
-}
-
-export enum CandlestickType {
-    bullish = 'bullish',
-    bearish = 'bearish',
-}
+import { CalcResult, TradenfoOptions, CandlestickData } from '../type';
+import { CryptoSide, CandlestickType } from '../enum';
 
 export class TradeInfo {
     constructor(srcCryptoPair: string, dstCryptoPair: string, options: TradenfoOptions) {
@@ -188,7 +146,17 @@ export class TradeInfo {
         }));
     }
 
-    public async calculate(investAmountByUsdt: number, desiredProfitPercentage: number): Promise<CalcResult> {
+    private async buyMarket(amountBySrc: number) {
+        return await this.binanceApiAuth.marketBuy(this.cryptoPair.complete, amountBySrc);
+    }
+
+    private async sellLimit(amountBySrc: number, priceToSell: number) {
+        const fixedNum = 6;
+
+        return await this.binanceApiAuth.sell(this.cryptoPair.complete, amountBySrc, priceToSell.toFixed(fixedNum));
+    }
+
+    public async orderInstantBuySell(investAmountByUsdt: number, desiredProfitPercentage: number): Promise<CalcResult> {
         const isTimeToBuy = await this.isTimeToBuy();
         utils.log({ SL: 1, isTimeToBuy });
 
@@ -225,40 +193,7 @@ export class TradeInfo {
         };
     }
 
-    private async buyMarket(amountBySrc: number) {
-        return await this.binanceApiAuth.marketBuy(this.cryptoPair.complete, amountBySrc);
-    }
-
-    private async sellLimit(amountBySrc: number, priceToSell: number) {
-        const fixedNum = 6;
-
-        return await this.binanceApiAuth.sell(this.cryptoPair.complete, amountBySrc, priceToSell.toFixed(fixedNum));
-    }
-
-    public async test(objInput: any): Promise<void> {
-        // const ticker = await this.binanceApi.prices();
-        // const res = ticker[this.cryptoPair.complete] * 1;
-
-        // utils.log(res);
-
-        // utils.log(this.binanceApi.websockets.miniTicker.toString());
-
-        // await this.binanceApi.websockets.miniTicker((tickers: any) => {
-        //     utils.log(tickers.BTCUSDT)
-        // });
-        // return;
-
-        // this.streamTicker((candleStickInfo) => {
-        //     utils.log(candleStickInfo);
-        // });
-
-        // await this.binanceApi.websockets.candlesticks(this.cryptoPair.complete, '1m', (candlestick: any) => {
-        //     utils.log(candlestick)
-        // })
-
-        // const res = await this.getCandlestickHistories('1m', 10);
-        // utils.log(res);        
-
+    public async orderPlanA(objInput: any): Promise<void> {
         const isTimeToBuy = await this.isTimeToBuy();
         utils.log({ isTimeToBuy });
 
