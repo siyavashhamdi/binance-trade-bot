@@ -263,7 +263,7 @@ export class TradeInfo {
         utils.log({ isTimeToBuy });
 
         if (isTimeToBuy) {
-            this.nextCheckBuy = utils.addSecondsToDate(this.nextCheckBuy, 6 * 60);  // The next buy/sell after at least 6 minutes
+            this.nextCheckBuy = utils.addSecondsToDate(new Date(), 6 * 60);  // The next buy/sell after at least 6 minutes
 
             const resBuy = await this.buyMarket(objInput.priceToBuy);
             utils.log({ SL: 1, resBuy, fills: resBuy.fills });
