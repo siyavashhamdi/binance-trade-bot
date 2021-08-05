@@ -46,6 +46,8 @@ export class TradeInfo {
     private async checkTimeToBuy(samplingCount = 5): Promise<{ isRightTime: boolean, errMsg?: string }> {
         const isTimeReached = this.nextCheckBuy < new Date();
 
+        console.log({ SL: 1, isTimeReached, ncb: this.nextCheckBuy, currentDt: new Date() })
+
         if (!isTimeReached) {
             return {
                 isRightTime: false,
@@ -196,31 +198,31 @@ export class TradeInfo {
     public async orderPlanA(objInput: any): Promise<void> {
         const timeToBuyStatus = await this.checkTimeToBuy();
 
-        if (timeToBuyStatus.isRightTime) {
-            this.nextCheckBuy = utils.addSecondsToDate(new Date(), 6 * 60);  // The next buy/sell after at least 6 minutes
+        if (!timeToBuyStatus.isRightTime) {
+            utils.log(`Not a right time to buy. Msg: ${ timeToBuyStatus.errMsg }`);
+        }
 
-            const resBuy = await this.buyMarket(objInput.priceToBuy);
+        this.nextCheckBuy = utils.addSecondsToDate(new Date(), 6 * 60);  // The next buy/sell after at least 6 minutes
 
-            utils.log(`Market buy done on price ${ resBuy.fills[0].price }${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty }${ this.cryptoPair.src }`);
+        const resBuy = await this.buyMarket(objInput.priceToBuy);
 
-            if (resBuy?.status === 'FILLED') {
-                // Buy
-                const priceToBuy = +resBuy.fills[0].price;
-                const investAmountByDst = +resBuy.cummulativeQuoteQty;
+        utils.log(`Market buy done on price ${ resBuy.fills[0].price }${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty }${ this.cryptoPair.src }`);
 
-                // Sell
-                const fees = this.calcFee(investAmountByDst, objInput.desiredProfitPercentage);
-                const breakEvenToSell = this.calcSellBreakEven(priceToBuy, fees, investAmountByDst);
-                const priceToSell = this.calcSellSrcPrice(breakEvenToSell, objInput.desiredProfitPercentage);
+        if (resBuy?.status === 'FILLED') {
+            // Buy
+            const priceToBuy = +resBuy.fills[0].price;
+            const investAmountByDst = +resBuy.cummulativeQuoteQty;
 
-                const resSell = await this.sellLimit(objInput.priceToBuy, priceToSell);
+            // Sell
+            const fees = this.calcFee(investAmountByDst, objInput.desiredProfitPercentage);
+            const breakEvenToSell = this.calcSellBreakEven(priceToBuy, fees, investAmountByDst);
+            const priceToSell = this.calcSellSrcPrice(breakEvenToSell, objInput.desiredProfitPercentage);
 
-                utils.log(`Sell order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
-            } else {
-                utils.log('Buy status is not Filled!');
-            }
+            const resSell = await this.sellLimit(objInput.priceToBuy, priceToSell);
+
+            utils.log(`Sell order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
         } else {
-            utils.log(`Not a right time to buy ${ timeToBuyStatus.errMsg }`);
+            utils.log('Buy status is not Filled!');
         }
     }
 }
