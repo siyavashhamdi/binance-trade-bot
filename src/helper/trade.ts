@@ -49,8 +49,6 @@ export class TradeInfo {
 
         const isTimeReached = this.nextCheckBuy < new Date();
 
-        console.log({ SL: 1, isTimeReached, ncb: this.nextCheckBuy, currentDt: new Date() })
-
         if (!isTimeReached) {
             return {
                 isRightTime: false,
