@@ -200,6 +200,7 @@ export class TradeInfo {
 
         if (!timeToBuyStatus.isRightTime) {
             utils.log(`Not a right time to buy. Msg: ${ timeToBuyStatus.errMsg }`);
+            return;
         }
 
         this.nextCheckBuy = utils.addSecondsToDate(new Date(), 6 * 60);  // The next buy/sell after at least 6 minutes

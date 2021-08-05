@@ -17,8 +17,11 @@ const addSecondsToDate = (date: Date, seconds: number): Date => {
     return addedDate.toDate();
 }
 
-const log = (logValue: unknown): void => {
+const log = (logValue: string): void => {
     const dateTime = formatDateTime(new Date());
+
+    console.log({ SL: 0, logValue, currentDt: new Date(), dateTime })
+
     const modifiedLogValue = `[${ dateTime }] : ${ logValue }`;
 
     console.log(modifiedLogValue);
