@@ -42,7 +42,7 @@ export class TradeInfo {
 
     private async checkTimeToBuy(samplingCount = 5): Promise<{ isRightTime: boolean, errMsg?: string }> {
         // test - temp to delete
-        const csHistoriesX = await this.getCandlestickHistories('1m', samplingCount);
+        const csHistoriesX = await this.getCandlestickHistories('5m', samplingCount);
         const candlestickHightsX = csHistoriesX.map(item => Math.abs(item.high - item.low));
         const stdValX = std(candlestickHightsX);
         utils.log(`STD: ${ stdValX }`);
@@ -57,7 +57,7 @@ export class TradeInfo {
         }
 
         const SamplingCount80Percent = samplingCount * 0.8;
-        const csHistories = await this.getCandlestickHistories('1m', samplingCount);
+        const csHistories = await this.getCandlestickHistories('5m', samplingCount);
         const bullishCount = csHistories.filter(item => item.type === CandlestickType.bullish).length;
 
         // At least 80% of sampling must be bullish
