@@ -90,7 +90,7 @@ export class TradeInfo {
         // }
 
         return {
-            isRightTime: false,
+            isRightTime: true,
         };
     }
 

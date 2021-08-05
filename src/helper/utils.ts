@@ -6,7 +6,7 @@ const formatDateTime = (dateTime: number | Date, timezone = 'Asia/Tehran'): stri
     const unixTs = typeof dateTime === 'number' ? dateTime : dateTime.getTime();
     const date = moment(unixTs).tz(timezone);
 
-    return date.format('yyyy/MM/DD HH:mm:ss.SSS');
+    return date.format('yyyy/MM/DD, HH:mm:ss.SSS');
 }
 
 const addSecondsToDate = (date: Date, seconds: number): Date => {
