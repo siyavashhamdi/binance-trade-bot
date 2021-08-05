@@ -221,6 +221,8 @@ export class TradeInfo {
             } else {
                 utils.log('Buy status is not Filled!');
             }
+        } else {
+            utils.log(`Not a right time to buy ${ timeToBuyStatus.errMsg }`);
         }
     }
 }
