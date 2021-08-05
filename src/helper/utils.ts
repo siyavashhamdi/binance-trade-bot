@@ -5,10 +5,7 @@ import moment from 'moment-timezone';
 const zeroPad = (num: unknown, places: number): string => String(num).padStart(places, '0')
 
 const formatDateTime = (dateTime: number | Date, timezone = 'Asia/Tehran'): string => {
-    const unixTs = typeof dateTime === 'number' ? dateTime : dateTime.getDate();
-
-    console.log({ SL: 0, dateTime, timezone: new Date(), unixTs, typeOf: typeof dateTime })
-
+    const unixTs = typeof dateTime === 'number' ? dateTime : dateTime.getTime();
     const date = moment(unixTs).tz(timezone);
 
     return date.format('yyyy/MM/DD HH:mm:ss.SSS');
