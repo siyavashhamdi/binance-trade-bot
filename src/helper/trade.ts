@@ -64,7 +64,7 @@ export class TradeInfo {
 
         const Binance = require('node-binance-api');
 
-        console.log({ options });
+        utils.log({ options });
 
         this.binanceApi = new Binance();
         this.binanceApiAuth = new Binance().options({ APIKEY: this.options.apiKey, APISECRET: this.options.apiSecret });
@@ -91,6 +91,7 @@ export class TradeInfo {
         const isTimeReached = this.nextCheckBuy < new Date();
 
         if (!isTimeReached) {
+            utils.log(`Time is not reached: ${ this.nextCheckBuy } < ${ new Date() }`);
             return false;
         }
 
@@ -98,10 +99,12 @@ export class TradeInfo {
         const csHistories = await this.getCandlestickHistories('5m', samplingCount);
         const bullishCount = csHistories.filter(item => item.type === CandlestickType.bullish).length;
 
-        console.log({ samplingCount, SamplingCount80Percent, bullishCount, csHistories });
+        utils.log({ samplingCount, SamplingCount80Percent, bullishCount, csHistories });
 
         // At least 80% of sampling must be bullish
         if (bullishCount < SamplingCount80Percent) {
+            utils.log(`Sampling count is not satisfied: ${ bullishCount } < ${ SamplingCount80Percent }`);
+
             return false;
         }
 
@@ -110,6 +113,8 @@ export class TradeInfo {
             csHistories[samplingCount - 1].type === CandlestickType.bearish;
 
         if (isBearishFoundInLasts) {
+            utils.log(`Bearish found in last candlesticks`);
+
             return false
         }
 
@@ -233,34 +238,34 @@ export class TradeInfo {
         // const ticker = await this.binanceApi.prices();
         // const res = ticker[this.cryptoPair.complete] * 1;
 
-        // console.log(res);
+        // utils.log(res);
 
-        // console.log(this.binanceApi.websockets.miniTicker.toString());
+        // utils.log(this.binanceApi.websockets.miniTicker.toString());
 
         // await this.binanceApi.websockets.miniTicker((tickers: any) => {
-        //     console.log(tickers.BTCUSDT)
+        //     utils.log(tickers.BTCUSDT)
         // });
         // return;
 
         // this.streamTicker((candleStickInfo) => {
-        //     console.log(candleStickInfo);
+        //     utils.log(candleStickInfo);
         // });
 
         // await this.binanceApi.websockets.candlesticks(this.cryptoPair.complete, '1m', (candlestick: any) => {
-        //     console.log(candlestick)
+        //     utils.log(candlestick)
         // })
 
         // const res = await this.getCandlestickHistories('1m', 10);
-        // console.log(res);        
+        // utils.log(res);        
 
         const isTimeToBuy = await this.isTimeToBuy();
-        console.log({ isTimeToBuy });
+        utils.log({ isTimeToBuy });
 
         if (isTimeToBuy) {
             this.nextCheckBuy = utils.addSecondsToDate(this.nextCheckBuy, 6 * 60);  // The next buy/sell after at least 6 minutes
 
             const resBuy = await this.buyMarket(objInput.priceToBuy);
-            console.log({ SL: 1, resBuy, fills: resBuy.fills });
+            utils.log({ SL: 1, resBuy, fills: resBuy.fills });
 
             if (resBuy?.status === 'FILLED') {
                 // Buy
@@ -272,11 +277,11 @@ export class TradeInfo {
                 const breakEvenToSell = this.calcSellBreakEven(priceToBuy, fees, investAmountByDst);
                 const priceToSell = this.calcSellSrcPrice(breakEvenToSell, objInput.desiredProfitPercentage);
 
-                console.log({ SL: 2, objInput, priceToBuy, investAmountByDst, fees, breakEvenToSell, priceToSell });
+                utils.log({ SL: 2, objInput, priceToBuy, investAmountByDst, fees, breakEvenToSell, priceToSell });
 
                 const resSell = await this.sellLimit(objInput.priceToBuy, priceToSell);
 
-                console.log({ SL: 3, resSell });
+                utils.log({ SL: 3, resSell });
             } else {
                 throw new Error('Buy status is not Filled!');
             }
