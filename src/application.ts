@@ -6,12 +6,10 @@ export async function bootstrap() {
 
     setInterval(async () => {
         try {
-            // await tradeInfoEthBtc.orderPlanA({
-            //     priceToBuy: 0.002,
-            //     desiredProfitPercentage: 0.05,
-            // })
-
-            utils.log('salam');
+            await tradeInfoEthBtc.orderPlanA({
+                priceToBuy: 0.002,
+                desiredProfitPercentage: 0.05,
+            })
         } catch (err) {
             utils.log(JSON.stringify({ err }));
         }
