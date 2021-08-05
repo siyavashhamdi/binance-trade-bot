@@ -6,6 +6,9 @@ const zeroPad = (num: unknown, places: number): string => String(num).padStart(p
 
 const formatDateTime = (dateTime: number | Date, timezone = 'Asia/Tehran'): string => {
     const unixTs = typeof dateTime === 'number' ? dateTime : dateTime.getDate();
+
+    console.log({ SL: 0, dateTime, timezone: new Date(), unixTs })
+
     const date = moment(unixTs).tz(timezone);
 
     return date.format('yyyy/MM/DD HH:mm:ss.SSS');
@@ -19,9 +22,6 @@ const addSecondsToDate = (date: Date, seconds: number): Date => {
 
 const log = (logValue: string): void => {
     const dateTime = formatDateTime(new Date());
-
-    console.log({ SL: 0, logValue, currentDt: new Date(), dateTime })
-
     const modifiedLogValue = `[${ dateTime }] : ${ logValue }`;
 
     console.log(modifiedLogValue);
