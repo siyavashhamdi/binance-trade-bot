@@ -3,7 +3,7 @@ import utils from './utils';
 import { CalcResult, TradenfoOptions, CandlestickData } from '../type';
 import { CryptoSide, CandlestickType } from '../enum';
 
-export class TradeInfo {
+export class TradeInfoReverse {
     constructor(srcCryptoPair: string, dstCryptoPair: string, options: TradenfoOptions) {
         this.cryptoPair = {
             complete: `${ srcCryptoPair }${ dstCryptoPair }`,
@@ -51,24 +51,24 @@ export class TradeInfo {
 
         const SamplingCount80Percent = samplingCount * 0.8;
         const csHistories = await this.getCandlestickHistories('5m', samplingCount);
-        const bullishCount = csHistories.filter(item => item.type === CandlestickType.bullish).length;
+        const bearishCount = csHistories.filter(item => item.type === CandlestickType.bearish).length;
 
         // At least 80% of sampling must be bullish
-        if (bullishCount < SamplingCount80Percent) {
+        if (bearishCount < SamplingCount80Percent) {
             return {
                 isRightTime: false,
-                errMsg: `Sampling count is not satisfied: ${ bullishCount } < ${ SamplingCount80Percent }`,
+                errMsg: `Sampling count is not satisfied: ${ bearishCount } < ${ SamplingCount80Percent }`,
             };
         }
 
-        const isBearishFoundInLasts =
-            csHistories[samplingCount - 2].type === CandlestickType.bearish ||
-            csHistories[samplingCount - 1].type === CandlestickType.bearish;
+        const isBullishFoundInLasts =
+            csHistories[samplingCount - 2].type === CandlestickType.bullish ||
+            csHistories[samplingCount - 1].type === CandlestickType.bullish;
 
-        if (isBearishFoundInLasts) {
+        if (isBullishFoundInLasts) {
             return {
                 isRightTime: false,
-                errMsg: 'Bearish found in last candlesticks!',
+                errMsg: 'Bullish found in last candlesticks!',
             };
         }
 
@@ -143,14 +143,14 @@ export class TradeInfo {
         }));
     }
 
-    private async buyMarket(amountBySrc: number) {
-        return await this.binanceApiAuth.marketBuy(this.cryptoPair.complete, amountBySrc);
+    private async sellMarket(amountByDst: number) {
+        return await this.binanceApiAuth.marketBuy(this.cryptoPair.complete, amountByDst);
     }
 
-    private async sellLimit(amountBySrc: number, priceToSell: number) {
+    private async buylLimit(amountByDst: number, priceToSell: number) {
         const fixedNum = 6;
 
-        return await this.binanceApiAuth.sell(this.cryptoPair.complete, amountBySrc, priceToSell.toFixed(fixedNum));
+        return await this.binanceApiAuth.sell(this.cryptoPair.complete, amountByDst, priceToSell.toFixed(fixedNum));
     }
 
     public async orderInstantBuySell(investAmountByUsdt: number, desiredProfitPercentage: number): Promise<CalcResult> {
@@ -193,15 +193,16 @@ export class TradeInfo {
         const timeToBuyStatus = await this.checkTimeToBuy();
 
         if (!timeToBuyStatus.isRightTime) {
-            utils.log(`Not a right time to buy. Msg: ${ timeToBuyStatus.errMsg }`);
+            utils.log(`Reverse: Not a right time to buy. Msg: ${ timeToBuyStatus.errMsg }`);
             return;
         }
 
+        return;
         this.nextCheckBuy = utils.addSecondsToDate(new Date(), 6 * 60);  // The next buy/sell after at least 6 minutes
 
-        const resBuy = await this.buyMarket(objInput.priceToBuy);
+        const resBuy = await this.sellMarket(objInput.priceToBuy);
 
-        utils.log(`Market buy done on price ${ resBuy.fills[0].price }${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty }${ this.cryptoPair.src }`);
+        utils.log(`Reverse: Market buy done on price ${ resBuy.fills[0].price }${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty }${ this.cryptoPair.src }`);
 
         if (resBuy?.status === 'FILLED') {
             // Buy
@@ -213,11 +214,11 @@ export class TradeInfo {
             const breakEvenToSell = this.calcSellBreakEven(priceToBuy, fees, investAmountByDst);
             const priceToSell = this.calcSellSrcPrice(breakEvenToSell, objInput.desiredProfitPercentage);
 
-            await this.sellLimit(objInput.priceToBuy, priceToSell);
+            await this.buylLimit(objInput.priceToBuy, priceToSell);
 
-            utils.log(`Sell order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
+            utils.log(`Reverse: Sell order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
         } else {
-            utils.log('Buy status is not Filled!');
+            utils.log('Reverse: Buy status is not Filled!');
         }
     }
 }
