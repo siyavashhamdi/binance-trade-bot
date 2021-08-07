@@ -143,8 +143,8 @@ export class TradeInfoReverse {
         }));
     }
 
-    private async sellMarket(amountByDst: number) {
-        return await this.binanceApiAuth.sellMarket(this.cryptoPair.complete, amountByDst);
+    private async sellMarket(amountBySrc: number) {
+        return await this.binanceApiAuth.sellMarket(this.cryptoPair.complete, amountBySrc);
     }
 
     private async buylLimit(amountByDst: number, priceToSell: number) {
@@ -190,6 +190,10 @@ export class TradeInfoReverse {
     }
 
     public async orderPlanA(objInput: any): Promise<void> {
+        const resBuyX = await this.sellMarket(objInput.priceToSell);
+        console.log({ SL: 1, msg: 'sell done', resBuyX });
+        return;
+
         const timeToBuyStatus = await this.checkTimeToBuy();
 
         if (!timeToBuyStatus.isRightTime) {
@@ -197,10 +201,9 @@ export class TradeInfoReverse {
             return;
         }
 
-
         this.nextCheckBuy = utils.addSecondsToDate(new Date(), 6 * 60);  // The next buy/sell after at least 6 minutes
 
-        const resBuy = await this.sellMarket(objInput.priceToBuy);
+        const resBuy = await this.sellMarket(objInput.priceToSell);
 
         utils.log(`Reverse: Market buy done on price ${ resBuy.fills[0].price }${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty }${ this.cryptoPair.src }`);
 
@@ -223,7 +226,7 @@ export class TradeInfoReverse {
                 priceToSell,
                 resBuy,
             })
-            // await this.buylLimit(objInput.priceToBuy, priceToSell);
+            // await this.buylLimit(objInput.priceToSell, priceToSell);
 
             utils.log(`Reverse: Sell order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
         } else {
