@@ -147,10 +147,10 @@ export class TradeInfoReverse {
         return await this.binanceApiAuth.marketSell(this.cryptoPair.complete, amountBySrc);
     }
 
-    private async buylLimit(amountByDst: number, priceToSell: number) {
+    private async buylLimit(amountByDst: number, priceToBuy: number) {
         const fixedNum = 6;
 
-        return await this.binanceApiAuth.sell(this.cryptoPair.complete, amountByDst, priceToSell.toFixed(fixedNum));
+        return await this.binanceApiAuth.buy(this.cryptoPair.complete, amountByDst, priceToBuy.toFixed(fixedNum));
     }
 
     public async orderInstantBuySell(investAmountByUsdt: number, desiredProfitPercentage: number): Promise<CalcResult> {
