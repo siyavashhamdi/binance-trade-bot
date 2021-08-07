@@ -103,15 +103,15 @@ export class TradeInfoReverse {
         const percentageCoeff = 1 + (desiredProfitPercentage / 100);
         const sellFee = investAmountByDst * percentageCoeff * 0.00075;
 
-        return buyFee - sellFee;
+        return buyFee + sellFee;
     }
 
     private calcSellBreakEven(priceToBuy: number, fees: number, investAmountByDst: number) {
-        return priceToBuy + ((fees * priceToBuy) / investAmountByDst);
+        return priceToBuy - ((fees * priceToBuy) / investAmountByDst);
     }
 
     private calcSellSrcPrice(breakEvenToSell: number, desiredProfitPercentage: number) {
-        const percentageCoeff = 1 + (desiredProfitPercentage / 100);
+        const percentageCoeff = 1 - (desiredProfitPercentage / 100);
         return breakEvenToSell * percentageCoeff;
     }
 
