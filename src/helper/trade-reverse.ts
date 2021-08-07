@@ -214,7 +214,16 @@ export class TradeInfoReverse {
             const breakEvenToSell = this.calcSellBreakEven(priceToBuy, fees, investAmountByDst);
             const priceToSell = this.calcSellSrcPrice(breakEvenToSell, objInput.desiredProfitPercentage);
 
-            await this.buylLimit(objInput.priceToBuy, priceToSell);
+            console.log({
+                SL: 1,
+                priceToBuy,
+                investAmountByDst,
+                fees,
+                breakEvenToSell,
+                priceToSell,
+                resBuy,
+            })
+            // await this.buylLimit(objInput.priceToBuy, priceToSell);
 
             utils.log(`Reverse: Sell order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
         } else {
