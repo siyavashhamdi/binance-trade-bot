@@ -144,7 +144,7 @@ export class TradeInfoReverse {
     }
 
     private async sellMarket(amountByDst: number) {
-        return await this.binanceApiAuth.marketBuy(this.cryptoPair.complete, amountByDst);
+        return await this.binanceApiAuth.sellMarket(this.cryptoPair.complete, amountByDst);
     }
 
     private async buylLimit(amountByDst: number, priceToSell: number) {
@@ -214,9 +214,7 @@ export class TradeInfoReverse {
             const breakEvenToSell = this.calcSellBreakEven(priceToBuy, fees, investAmountByDst);
             const priceToSell = this.calcSellSrcPrice(breakEvenToSell, objInput.desiredProfitPercentage);
 
-            console.log({ SL: 1, priceToBuy: objInput.priceToBuy, priceToSell });
-            // await this.buylLimit(objInput.priceToBuy, priceToSell);
-            return;
+            await this.buylLimit(objInput.priceToBuy, priceToSell);
 
             utils.log(`Reverse: Sell order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
         } else {
