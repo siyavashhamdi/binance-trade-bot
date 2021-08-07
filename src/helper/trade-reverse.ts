@@ -192,10 +192,10 @@ export class TradeInfoReverse {
     public async orderPlanA(objInput: any): Promise<void> {
         const timeToBuyStatus = await this.checkTimeToBuy();
 
-        // if (!timeToBuyStatus.isRightTime) {
-        //     utils.log(`Reverse: Not a right time to buy. Msg: ${ timeToBuyStatus.errMsg }`);
-        //     return;
-        // }
+        if (!timeToBuyStatus.isRightTime) {
+            utils.log(`Reverse: Not a right time to buy. Msg: ${ timeToBuyStatus.errMsg }`);
+            return;
+        }
 
         this.nextCheckBuy = utils.addSecondsToDate(new Date(), 6 * 60);  // The next buy/sell after at least 6 minutes
 
@@ -213,16 +213,7 @@ export class TradeInfoReverse {
             const breakEvenToSell = this.calcSellBreakEven(priceToBuy, fees, investAmountByDst);
             const priceToSell = this.calcSellSrcPrice(breakEvenToSell, objInput.desiredProfitPercentage);
 
-            console.log({
-                SL: 1,
-                priceToBuy,
-                investAmountByDst,
-                fees,
-                breakEvenToSell,
-                priceToSell,
-                resBuy,
-            })
-            // await this.buylLimit(objInput.priceToSell, priceToSell);
+            await this.buylLimit(objInput.priceToSell, priceToSell);
 
             utils.log(`Reverse: Buy order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
         } else {
