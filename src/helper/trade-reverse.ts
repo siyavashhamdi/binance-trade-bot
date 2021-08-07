@@ -214,7 +214,7 @@ export class TradeInfoReverse {
             const breakEvenToSell = this.calcSellBreakEven(priceToBuy, fees, investAmountByDst);
             const priceToSell = this.calcSellSrcPrice(breakEvenToSell, objInput.desiredProfitPercentage);
 
-            console.log({ SL: 1, objInput.priceToBuy, priceToSell })
+            console.log({ SL: 1, priceToBuy: objInput.priceToBuy, priceToSell });
             // await this.buylLimit(objInput.priceToBuy, priceToSell);
             return;
 
