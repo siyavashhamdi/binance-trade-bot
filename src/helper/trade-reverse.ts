@@ -50,7 +50,7 @@ export class TradeInfoReverse {
         }
 
         const SamplingCount80Percent = samplingCount * 0.8;
-        const csHistories = await this.getCandlestickHistories('5m', samplingCount);
+        const csHistories = await this.getCandlestickHistories('1m', samplingCount);
         const bearishCount = csHistories.filter(item => item.type === CandlestickType.bearish).length;
 
         // At least 80% of sampling must be bullish
@@ -128,7 +128,7 @@ export class TradeInfoReverse {
         });
     }
 
-    private async getCandlestickHistories(interval = '1m', limit = 10): Promise<Array<CandlestickData>> {
+    private async getCandlestickHistories(interval = '5m', limit = 10): Promise<Array<CandlestickData>> {
         const url = `https://api.binance.com/api/v3/klines?symbol=${ this.cryptoPair.complete }&interval=${ interval }&limit=${ limit }`;
         const response = await axios.get(url);
 
