@@ -144,7 +144,7 @@ export class TradeInfoReverse {
     }
 
     private async sellMarket(amountBySrc: number) {
-        return await this.binanceApiAuth.sellMarket(this.cryptoPair.complete, amountBySrc);
+        return await this.binanceApiAuth.marketSell(this.cryptoPair.complete, amountBySrc);
     }
 
     private async buylLimit(amountByDst: number, priceToSell: number) {
