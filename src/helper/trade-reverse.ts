@@ -103,7 +103,7 @@ export class TradeInfoReverse {
         const percentageCoeff = 1 + (desiredProfitPercentage / 100);
         const sellFee = investAmountByDst * percentageCoeff * 0.00075;
 
-        return buyFee + sellFee;
+        return buyFee - sellFee;
     }
 
     private calcSellBreakEven(priceToBuy: number, fees: number, investAmountByDst: number) {
@@ -224,9 +224,9 @@ export class TradeInfoReverse {
             })
             // await this.buylLimit(objInput.priceToSell, priceToSell);
 
-            utils.log(`Reverse: Sell order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
+            utils.log(`Reverse: Buy order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
         } else {
-            utils.log('Reverse: Buy status is not Filled!');
+            utils.log('Reverse: Sell status is not Filled!');
         }
     }
 }
