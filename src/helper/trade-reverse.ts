@@ -190,16 +190,12 @@ export class TradeInfoReverse {
     }
 
     public async orderPlanA(objInput: any): Promise<void> {
-        const resBuyX = await this.sellMarket(objInput.priceToSell);
-        console.log({ SL: 1, msg: 'sell done', resBuyX });
-        return;
-
         const timeToBuyStatus = await this.checkTimeToBuy();
 
-        if (!timeToBuyStatus.isRightTime) {
-            utils.log(`Reverse: Not a right time to buy. Msg: ${ timeToBuyStatus.errMsg }`);
-            return;
-        }
+        // if (!timeToBuyStatus.isRightTime) {
+        //     utils.log(`Reverse: Not a right time to buy. Msg: ${ timeToBuyStatus.errMsg }`);
+        //     return;
+        // }
 
         this.nextCheckBuy = utils.addSecondsToDate(new Date(), 6 * 60);  // The next buy/sell after at least 6 minutes
 
