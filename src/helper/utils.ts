@@ -15,7 +15,7 @@ const addSecondsToDate = (date: Date, seconds: number): Date => {
     return addedDate.toDate();
 }
 
-const log = (logValue: string | number): void => {
+const consoleLog = (logValue: string | number): void => {
     const dateTime = formatDateTime(new Date());
     const modifiedLogValue = `[${ dateTime }] : ${ logValue }`;
 
@@ -26,5 +26,5 @@ export default {
     zeroPad,
     formatDateTime,
     addSecondsToDate,
-    log,
+    consoleLog,
 };

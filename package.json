@@ -27,6 +27,7 @@
     "dotenv": "^10.0.0",
     "mathjs": "^9.4.4",
     "moment-timezone": "^0.5.33",
-    "node-binance-api": "^0.12.5"
+    "node-binance-api": "^0.12.5",
+    "node-telegram-bot-api": "^0.54.0"
   }
 }

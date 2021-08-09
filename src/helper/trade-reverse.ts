@@ -193,7 +193,7 @@ export class TradeInfoReverse {
         const timeToBuyStatus = await this.checkTimeToBuy();
 
         if (!timeToBuyStatus.isRightTime) {
-            utils.log(`Reverse: Not a right time to buy. Msg: ${ timeToBuyStatus.errMsg }`);
+            utils.consoleLog(`Reverse: Not a right time to buy. Msg: ${ timeToBuyStatus.errMsg }`);
             return;
         }
 
@@ -201,7 +201,7 @@ export class TradeInfoReverse {
 
         const resBuy = await this.sellMarket(objInput.priceToSell);
 
-        utils.log(`Reverse: Market buy done on price ${ resBuy.fills[0].price }${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty }${ this.cryptoPair.src }`);
+        utils.consoleLog(`Reverse: Market buy done on price ${ resBuy.fills[0].price }${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty }${ this.cryptoPair.src }`);
 
         if (resBuy?.status === 'FILLED') {
             // Sell
@@ -215,9 +215,9 @@ export class TradeInfoReverse {
 
             await this.buylLimit(objInput.priceToSell, priceToSell);
 
-            utils.log(`Reverse: Buy order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
+            utils.consoleLog(`Reverse: Buy order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
         } else {
-            utils.log('Reverse: Sell status is not Filled!');
+            utils.consoleLog('Reverse: Sell status is not Filled!');
         }
     }
 }

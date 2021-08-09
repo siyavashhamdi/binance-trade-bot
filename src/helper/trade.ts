@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Telegram } from './telegram';
 import utils from './utils';
 import { CalcResult, TradenfoOptions, CandlestickData } from '../type';
 import { CryptoSide, CandlestickType } from '../enum';
@@ -31,6 +32,8 @@ export class TradeInfo {
     private binanceApiAuth: any;
 
     private nextCheckBuy: Date;
+
+    private telegram?: Telegram;
 
     private async getBestPriceToBuySrc(): Promise<number> {
         // The main algorithm comes here
@@ -153,6 +156,10 @@ export class TradeInfo {
         return await this.binanceApiAuth.sell(this.cryptoPair.complete, amountBySrc, priceToSell.toFixed(fixedNum));
     }
 
+    public setTelegram(telegram: Telegram) {
+        this.telegram = telegram;
+    }
+
     public async orderInstantBuySell(investAmountByUsdt: number, desiredProfitPercentage: number): Promise<CalcResult> {
         const timeToBuyStatus = await this.checkTimeToBuy();
 
@@ -193,7 +200,7 @@ export class TradeInfo {
         const timeToBuyStatus = await this.checkTimeToBuy();
 
         if (!timeToBuyStatus.isRightTime) {
-            utils.log(`Not a right time to buy. Msg: ${ timeToBuyStatus.errMsg }`);
+            utils.consoleLog(`Not a right time to buy. Msg: ${ timeToBuyStatus.errMsg }`);
             return;
         }
 
@@ -201,7 +208,7 @@ export class TradeInfo {
 
         const resBuy = await this.buyMarket(objInput.priceToBuy);
 
-        utils.log(`Market buy done on price ${ resBuy.fills[0].price }${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty }${ this.cryptoPair.src }`);
+        utils.consoleLog(`Market buy done on price ${ resBuy.fills[0].price }${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty }${ this.cryptoPair.src }`);
 
         if (resBuy?.status === 'FILLED') {
             // Buy
@@ -215,9 +222,12 @@ export class TradeInfo {
 
             await this.sellLimit(objInput.priceToBuy, priceToSell);
 
-            utils.log(`Sell order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
+            utils.consoleLog(`Sell order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
+
+            this.telegram?.sendBroadcastMessage(`Market buy done on price ${ resBuy.fills[0].price }${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty }${ this.cryptoPair.src }
+            Sell order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
         } else {
-            utils.log('Buy status is not Filled!');
+            utils.consoleLog('Buy status is not Filled!');
         }
     }
 }
