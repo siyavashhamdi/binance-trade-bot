@@ -23,8 +23,6 @@ export class Telegram {
             const command = match[1] as TelegramCommands;
             const chatId = msg.chat.id;
 
-            console.log({ SL: 0, command });
-
             switch (command) {
                 case TelegramCommands.salam: {
                     this.sendMessage(chatId, 'Salam');
@@ -39,12 +37,10 @@ export class Telegram {
                 };
 
                 case TelegramCommands.openOrders: {
-                    console.log({ SL: 0.1 });
-
                     this.tradeInfo?.getOpenOrders().then((openOrders) => {
-                        console.log({ SL: 1, openOrders });
-
-                        const resp = `Number of open orders: ${ openOrders.length }`;
+                        const resp = `Number of open orders: ${ openOrders.length }
+Low price is: \`${ openOrders.reduce((prev: any, curr: any) => prev.Cost < curr.Cost ? prev : curr) } \`
+High price is: \`${ openOrders.reduce((prev: any, curr: any) => prev.Cost > curr.Cost ? prev : curr) } \``
 
                         this.sendMessage(chatId, resp);
                     });
