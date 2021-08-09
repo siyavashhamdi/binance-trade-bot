@@ -13,6 +13,7 @@ export async function bootstrap() {
     telegram.sendBroadcastMessage('Application started.');
 
     tradeInfoEthBtc.setTelegram(telegram);
+    telegram.setTradeInfo(tradeInfoEthBtc);
 
     setInterval(async () => {
         try {

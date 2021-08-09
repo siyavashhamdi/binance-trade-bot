@@ -23,6 +23,8 @@ export class Telegram {
             const command = match[1] as TelegramCommands;
             const chatId = msg.chat.id;
 
+            console.log({ SL: 0, command });
+
             switch (command) {
                 case TelegramCommands.salam: {
                     this.sendMessage(chatId, 'Salam');
@@ -37,6 +39,8 @@ export class Telegram {
                 };
 
                 case TelegramCommands.openOrders: {
+                    console.log({ SL: 0.1 });
+
                     this.tradeInfo?.getOpenOrders().then((openOrders) => {
                         console.log({ SL: 1, openOrders });
 
