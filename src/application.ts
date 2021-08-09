@@ -23,7 +23,7 @@ export async function bootstrap() {
             });
 
             await tradeInfoEthBtcReverse.orderPlanA({
-                priceToBuy: 0.002,
+                priceToSell: 0.002,
                 desiredProfitPercentage: 0.05,
             });
         } catch (err) {
