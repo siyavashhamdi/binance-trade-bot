@@ -156,6 +156,12 @@ export class TradeInfo {
         return await this.binanceApiAuth.sell(this.cryptoPair.complete, amountBySrc, priceToSell.toFixed(fixedNum));
     }
 
+    public async getOpenOrders() {
+        const res = await this.binanceApiAuth.openOrders(this.cryptoPair.complete);
+
+        return res;
+    }
+
     public setTelegram(telegram: Telegram) {
         this.telegram = telegram;
     }

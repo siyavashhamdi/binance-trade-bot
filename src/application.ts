@@ -3,7 +3,6 @@ import { TradeInfo } from './helper/trade';
 import { TradeInfoReverse } from './helper/trade-reverse';
 
 import utils from './helper/utils';
-import { std, mean } from 'mathjs';
 
 export async function bootstrap() {
     const telegram = new Telegram({ token: process.env.TLG_API_TOKEN });

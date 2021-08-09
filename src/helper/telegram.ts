@@ -1,5 +1,6 @@
 import { TelegramCommands } from '../enum';
 import { TelegramBotOptions } from '../type';
+import { TradeInfo } from './trade';
 
 export class Telegram {
     constructor(options: TelegramBotOptions) {
@@ -15,6 +16,7 @@ export class Telegram {
 
     private telegramBot: any;
     private options: TelegramBotOptions;
+    private tradeInfo?: TradeInfo;
 
     public startListening(): void {
         this.telegramBot.onText(/\/(.+)/, (msg: any, match: any) => {
@@ -31,6 +33,17 @@ export class Telegram {
                     const resp = `Your chat id is: ${ chatId }`;
 
                     this.sendMessage(chatId, resp);
+                    break;
+                };
+
+                case TelegramCommands.openOrders: {
+                    this.tradeInfo?.getOpenOrders().then((openOrders) => {
+                        console.log({ SL: 1, openOrders });
+
+                        const resp = `Number of open orders: ${ openOrders.length }`;
+
+                        this.sendMessage(chatId, resp);
+                    });
                     break;
                 };
 
@@ -52,5 +65,9 @@ export class Telegram {
 
     public sendMessage(chatId: number, msg: string) {
         this.telegramBot.sendMessage(chatId, msg);
+    }
+
+    public setTradeInfo(tradeInfo: TradeInfo) {
+        this.tradeInfo = tradeInfo;
     }
 }
