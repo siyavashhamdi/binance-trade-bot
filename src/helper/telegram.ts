@@ -39,8 +39,8 @@ export class Telegram {
                 case TelegramCommands.openOrders: {
                     this.tradeInfo?.getOpenOrders().then((openOrders) => {
                         const resp = `Number of open orders: ${ openOrders.length }
-Low price: ${ Math.max(...openOrders.map((item: any) => +item.price)) }
-High price: ${ Math.min(...openOrders.map((item: any) => +item.price)) }`
+Max price: ${ Math.max(...openOrders.map((item: any) => +item.price)) }
+Min price: ${ Math.min(...openOrders.map((item: any) => +item.price)) }`
 
                         this.sendMessage(chatId, resp);
                     });

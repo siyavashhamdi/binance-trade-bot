@@ -18,6 +18,7 @@ export async function bootstrap() {
     telegram.setTradeInfo(tradeInfoEthBtc);
 
     tradeInfoEthBtc.listenOpenOrderChanges();
+    tradeInfoEthBtcReverse.listenOpenOrderChanges();
 
     setInterval(async () => {
         try {
