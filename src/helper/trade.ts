@@ -162,6 +162,12 @@ export class TradeInfo {
         return res;
     }
 
+    public async getBalanceOfThree() {
+        const res = await this.binanceApiAuth.balance(this.cryptoPair.complete);
+
+        return res;
+    }
+
     public setTelegram(telegram: Telegram) {
         this.telegram = telegram;
     }
