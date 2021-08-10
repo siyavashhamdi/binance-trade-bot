@@ -180,7 +180,8 @@ BTC: ${ btc.toFixed(8) } (${ btc })
 ETH: ${ eth.toFixed(8) } (${ ethBtc })
 BNB: ${ bnb.toFixed(8) } (${ bnbBtc })
 
-TOTAL(BTC): ${ (+(btc + ethBtc + bnbBtc)).toFixed(8) }
+TOTAL(BTC): ${ ((+btc) + (+ethBtc) + (+bnbBtc)).toFixed(8)
+    }
 `;
 
         return respMsg;
@@ -230,7 +231,7 @@ TOTAL(BTC): ${ (+(btc + ethBtc + bnbBtc)).toFixed(8) }
         const timeToBuyStatus = await this.checkTimeToBuy();
 
         if (!timeToBuyStatus.isRightTime) {
-            utils.consoleLog(`Not a right time to buy. Msg: ${ timeToBuyStatus.errMsg }`);
+            utils.consoleLog(`Not a right time to buy.Msg: ${ timeToBuyStatus.errMsg } `);
             return;
         }
 
@@ -238,7 +239,7 @@ TOTAL(BTC): ${ (+(btc + ethBtc + bnbBtc)).toFixed(8) }
 
         const resBuy = await this.buyMarket(objInput.priceToBuy);
 
-        utils.consoleLog(`Market buy done on price ${ resBuy.fills[0].price }${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty }${ this.cryptoPair.src }`);
+        utils.consoleLog(`Market buy done on price ${ resBuy.fills[0].price } ${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty } ${ this.cryptoPair.src } `);
 
         if (resBuy?.status === 'FILLED') {
             // Buy
@@ -252,10 +253,10 @@ TOTAL(BTC): ${ (+(btc + ethBtc + bnbBtc)).toFixed(8) }
 
             await this.sellLimit(objInput.priceToBuy, priceToSell);
 
-            utils.consoleLog(`Sell order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
+            utils.consoleLog(`Sell order created on price ${ priceToBuy } ${ this.cryptoPair.dst } with amount ${ investAmountByDst } ${ this.cryptoPair.src } `);
 
-            let msgBuySell = `Market buy done on price ${ resBuy.fills[0].price }${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty }${ this.cryptoPair.dst }
-Sell order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.dst }`;
+            let msgBuySell = `Market buy done on price ${ resBuy.fills[0].price } ${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty } ${ this.cryptoPair.dst }
+Sell order created on price ${ priceToBuy } ${ this.cryptoPair.dst } with amount ${ investAmountByDst } ${ this.cryptoPair.dst } `;
 
             const msgBalance = await this.getBalanceOfThree();
 
