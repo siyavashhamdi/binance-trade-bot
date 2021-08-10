@@ -163,9 +163,27 @@ export class TradeInfo {
     }
 
     public async getBalanceOfThree() {
-        const res = await this.binanceApiAuth.balance();
+        const balances = await this.binanceApiAuth.balance();
 
-        return res;
+        const eth = (+balances.ETH.available) + (+balances.ETH.onOrder);
+        const btc = (+balances.BTC.available) + (+balances.BTC.onOrder);
+        const bnb = (+balances.BNB.available) + (+balances.BNB.onOrder);
+
+        const priceBaseEthBtc = +(process.env.PRICE_BASE_ETH_BTC || '0');
+        const priceBaseBnbBtc = +(process.env.PRICE_BASE_BNB_BTC || '0');
+
+        const ethBtc = eth * priceBaseEthBtc;
+        const bnbBtc = bnb * priceBaseBnbBtc;
+
+        const respMsg = `Balances of three important coins:
+BTC: ${ btc.toFixed(8) }
+ETH: ${ eth.toFixed(8) }
+BNB: ${ bnb.toFixed(8) }
+
+TOTAL(BTC): ${ btc + ethBtc + bnbBtc }
+`;
+
+        return respMsg;
     }
 
     public setTelegram(telegram: Telegram) {
@@ -239,16 +257,9 @@ export class TradeInfo {
             let msgBuySell = `Market buy done on price ${ resBuy.fills[0].price }${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty }${ this.cryptoPair.dst }
 Sell order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.dst }`;
 
+            const msgBalance = await this.getBalanceOfThree();
 
-            const balances = await this.getBalanceOfThree();
-
-            const eth = (+balances.ETH.available) + (+balances.ETH.onOrder);
-            const btc = (+balances.BTC.available) + (+balances.BTC.onOrder);
-            const bnb = (+balances.BNB.available) + (+balances.BNB.onOrder);
-
-            msgBuySell += `\n\nBalances of three important coins:\nBTC: ${ btc.toFixed(8) }\nETH: ${ eth.toFixed(8) }\nBNB: ${ bnb.toFixed(8) }`;
-
-            this.telegram?.sendBroadcastMessage(msgBuySell);
+            this.telegram?.sendBroadcastMessage(msgBalance);
         } else {
             utils.consoleLog('Buy status is not Filled!');
         }

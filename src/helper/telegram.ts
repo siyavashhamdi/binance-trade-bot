@@ -48,15 +48,7 @@ High price: ${ Math.min(...openOrders.map((item: any) => +item.price)) }`
                 };
 
                 case TelegramCommands.balance: {
-                    this.tradeInfo?.getBalanceOfThree().then((balances) => {
-                        const eth = (+balances.ETH.available) + (+balances.ETH.onOrder);
-                        const btc = (+balances.BTC.available) + (+balances.BTC.onOrder);
-                        const bnb = (+balances.BNB.available) + (+balances.BNB.onOrder);
-
-                        const resp = `Balances of three important coins:\nBTC: ${ btc.toFixed(8) }\nETH: ${ eth.toFixed(8) }\nBNB: ${ bnb.toFixed(8) }`;
-
-                        this.sendMessage(chatId, resp);
-                    });
+                    this.tradeInfo?.getBalanceOfThree().then((respMsg) => this.sendMessage(chatId, respMsg));
                     break;
                 };
 
