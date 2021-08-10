@@ -273,7 +273,7 @@ TOTAL(BTC): ${ ((+btc) + (+ethBtc) + (+bnbBtc)).toFixed(8) }
 Sell order created on price ${ priceToBuy } ${ this.cryptoPair.dst } with amount ${ investAmountByDst } ${ this.cryptoPair.dst } `;
 
             const msgBalance = await this.getBalanceOfThree();
-            this.currentOpenOrdersCount = (await this.getOpenOrders()).length;
+            this.currentOpenOrdersCount = (await this.getOpenOrders()).filter((item: any) => item.side === 'BUY').length;
 
             this.telegram?.sendBroadcastMessage(msgBuySell + '\n'.repeat(3) + msgBalance);
         } else {

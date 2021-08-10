@@ -253,7 +253,7 @@ TOTAL(BTC): ${ ((+btc) + (+ethBtc) + (+bnbBtc)).toFixed(8) }
 
         const resBuy = await this.sellMarket(objInput.priceToSell);
 
-        utils.consoleLog(`Reverse: Market buy done on price ${ resBuy.fills[0].price }${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty }${ this.cryptoPair.src }`);
+        utils.consoleLog(`Reverse: Market sell done on price ${ resBuy.fills[0].price }${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty }${ this.cryptoPair.src }`);
 
         if (resBuy?.status === 'FILLED') {
             // Sell
@@ -268,6 +268,14 @@ TOTAL(BTC): ${ ((+btc) + (+ethBtc) + (+bnbBtc)).toFixed(8) }
             await this.buylLimit(objInput.priceToSell, priceToSell);
 
             utils.consoleLog(`Reverse: Buy order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
+
+            let msgSellBuy = `Market sell done on price ${ resBuy.fills[0].price } ${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty } ${ this.cryptoPair.dst }
+Sell order created on price ${ priceToBuy } ${ this.cryptoPair.dst } with amount ${ investAmountByDst } ${ this.cryptoPair.dst } `;
+
+            const msgBalance = await this.getBalanceOfThree();
+            this.currentOpenOrdersCount = (await this.getOpenOrders()).filter((item: any) => item.side === 'BUY').length;
+
+            this.telegram?.sendBroadcastMessage(msgSellBuy + '\n'.repeat(3) + msgBalance);
         } else {
             utils.consoleLog('Reverse: Sell status is not Filled!');
         }
