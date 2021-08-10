@@ -53,7 +53,7 @@ High price: ${ Math.min(...openOrders.map((item: any) => +item.price)) }`
                         const btc = (+balances.BTC.available) + (+balances.BTC.onOrder);
                         const bnb = (+balances.BNB.available) + (+balances.BNB.onOrder);
 
-                        const resp = `Balances of three important coins:\BTC: ${ btc }\nETH: ${ eth }\nBNB: ${ bnb }`;
+                        const resp = `Balances of three important coins:\nBTC: ${ btc.toFixed(8) }\nETH: ${ eth.toFixed(8) }\nBNB: ${ bnb.toFixed(8) }`;
 
                         this.sendMessage(chatId, resp);
                     });
