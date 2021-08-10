@@ -238,6 +238,16 @@ export class TradeInfo {
 
             this.telegram?.sendBroadcastMessage(`Market buy done on price ${ resBuy.fills[0].price }${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty }${ this.cryptoPair.dst }
 Sell order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.dst }`);
+
+            const balances = await this.getBalanceOfThree();
+
+            const eth = (+balances.ETH.available) + (+balances.ETH.onOrder);
+            const btc = (+balances.BTC.available) + (+balances.BTC.onOrder);
+            const bnb = (+balances.BNB.available) + (+balances.BNB.onOrder);
+
+            const msgBalances = `Balances of three important coins:\nBTC: ${ btc.toFixed(8) }\nETH: ${ eth.toFixed(8) }\nBNB: ${ bnb.toFixed(8) }`;
+
+            this.telegram?.sendBroadcastMessage(msgBalances);
         } else {
             utils.consoleLog('Buy status is not Filled!');
         }
