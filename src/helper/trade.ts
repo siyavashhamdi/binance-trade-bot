@@ -181,7 +181,7 @@ ETH: ${ eth.toFixed(8) } (${ ethBtc })
 BNB: ${ bnb.toFixed(8) } (${ bnbBtc })
 
 TOTAL(BTC): ${ ((+btc) + (+ethBtc) + (+bnbBtc)).toFixed(8)
-    }
+            }
 `;
 
         return respMsg;
@@ -260,7 +260,7 @@ Sell order created on price ${ priceToBuy } ${ this.cryptoPair.dst } with amount
 
             const msgBalance = await this.getBalanceOfThree();
 
-            this.telegram?.sendBroadcastMessage(msgBalance);
+            this.telegram?.sendBroadcastMessage(msgBuySell + '\n' + msgBalance);
         } else {
             utils.consoleLog('Buy status is not Filled!');
         }
