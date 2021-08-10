@@ -157,7 +157,7 @@ export class TradeInfo {
         return await this.binanceApiAuth.sell(this.cryptoPair.complete, amountBySrc, priceToSell.toFixed(fixedNum));
     }
 
-    public listenOpenOrderChanges(pollingBySec = 5000) {
+    public listenOpenOrderChanges(pollingBySec = 10000) {
         setInterval(async () => {
             const openOrdersCount: number = (await this.getOpenOrders()).length;
 
