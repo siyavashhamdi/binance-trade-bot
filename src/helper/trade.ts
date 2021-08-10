@@ -166,7 +166,7 @@ export class TradeInfo {
 
                 const msgBalances = await this.getBalanceOfThree();
 
-                this.telegram?.sendBroadcastMessage(msgBalances);
+                this.telegram?.sendBroadcastMessage(`Open order count changed:\n${ msgBalances }`);
             }
         }, pollingBySec);
     }
