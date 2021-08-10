@@ -172,15 +172,15 @@ export class TradeInfo {
         const priceBaseEthBtc = +(process.env.PRICE_BASE_ETH_BTC || '0');
         const priceBaseBnbBtc = +(process.env.PRICE_BASE_BNB_BTC || '0');
 
-        const ethBtc = eth * priceBaseEthBtc;
-        const bnbBtc = bnb * priceBaseBnbBtc;
+        const ethBtc = (eth * priceBaseEthBtc).toFixed(8);
+        const bnbBtc = (bnb * priceBaseBnbBtc).toFixed(8);
 
         const respMsg = `Balances of three important coins:
-BTC: ${ btc.toFixed(8) }
-ETH: ${ eth.toFixed(8) }
-BNB: ${ bnb.toFixed(8) }
+BTC: ${ btc.toFixed(8) } (${ btc })
+ETH: ${ eth.toFixed(8) } (${ ethBtc })
+BNB: ${ bnb.toFixed(8) } (${ bnbBtc })
 
-TOTAL(BTC): ${ btc + ethBtc + bnbBtc }
+TOTAL(BTC): ${ (+(btc + ethBtc + bnbBtc)).toFixed(8) }
 `;
 
         return respMsg;
