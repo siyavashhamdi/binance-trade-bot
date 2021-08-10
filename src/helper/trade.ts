@@ -163,7 +163,7 @@ export class TradeInfo {
     }
 
     public async getBalanceOfThree() {
-        const res = await this.binanceApiAuth.balance(this.cryptoPair.complete);
+        const res = await this.binanceApiAuth.balance();
 
         return res;
     }
