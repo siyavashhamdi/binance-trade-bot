@@ -159,7 +159,7 @@ export class TradeInfo {
 
     public listenOpenOrderChanges(pollingBySec = 10000) {
         setInterval(async () => {
-            const openOrdersCount: number = (await this.getOpenOrders()).filter((item: any) => item.side === 'SELL').length;
+            const openOrdersCount: number = (await this.getOpenOrders('SELL')).length;
 
             if (openOrdersCount < this.currentOpenOrdersCount) {
                 this.currentOpenOrdersCount = openOrdersCount;
@@ -171,10 +171,10 @@ export class TradeInfo {
         }, pollingBySec);
     }
 
-    public async getOpenOrders() {
+    public async getOpenOrders(side: string) {
         const res = await this.binanceApiAuth.openOrders(this.cryptoPair.complete);
 
-        return res;
+        return res.filter((item: any) => item.side === side);
     }
 
     public async getBalanceOfThree() {
@@ -273,7 +273,7 @@ TOTAL(BTC): ${ ((+btc) + (+ethBtc) + (+bnbBtc)).toFixed(8) }
 Sell order created on price ${ priceToBuy } ${ this.cryptoPair.dst } with amount ${ investAmountByDst } ${ this.cryptoPair.dst } `;
 
             const msgBalance = await this.getBalanceOfThree();
-            this.currentOpenOrdersCount = (await this.getOpenOrders()).filter((item: any) => item.side === 'BUY').length;
+            this.currentOpenOrdersCount = (await this.getOpenOrders('SELL')).length;
 
             this.telegram?.sendBroadcastMessage(msgBuySell + '\n'.repeat(3) + msgBalance);
         } else {
