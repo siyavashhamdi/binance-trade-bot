@@ -171,10 +171,10 @@ export class TradeInfo {
         }, pollingBySec);
     }
 
-    public async getOpenOrders(side: string) {
+    public async getOpenOrders(side?: string) {
         const res = await this.binanceApiAuth.openOrders(this.cryptoPair.complete);
 
-        return res.filter((item: any) => item.side === side);
+        return res.filter((item: any) => !side || item.side === side);
     }
 
     public async getBalanceOfThree() {
