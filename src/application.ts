@@ -17,7 +17,7 @@ export async function bootstrap() {
 
     tradeInfoEthBtc.listenOpenOrderChanges();
 
-    const x = tradeInfoEthBtc.getOpenOrders();
+    const x = await tradeInfoEthBtc.getOpenOrders();
     console.log({ x });
 
     setInterval(async () => {
