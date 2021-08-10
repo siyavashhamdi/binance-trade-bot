@@ -270,7 +270,7 @@ TOTAL(BTC): ${ ((+btc) + (+ethBtc) + (+bnbBtc)).toFixed(8) }
             utils.consoleLog(`Sell order created on price ${ priceToBuy } ${ this.cryptoPair.dst } with amount ${ investAmountByDst } ${ this.cryptoPair.src } `);
 
             let msgBuySell = `Market buy done on price ${ resBuy.fills[0].price } ${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty } ${ this.cryptoPair.dst }
-Sell order created on price ${ priceToBuy } ${ this.cryptoPair.dst } with amount ${ investAmountByDst } ${ this.cryptoPair.dst } `;
+Sell order created on price ${ priceToSell } ${ this.cryptoPair.dst } with amount ${ investAmountByDst } ${ this.cryptoPair.dst } `;
 
             const msgBalance = await this.getBalanceOfThree();
             this.currentOpenOrdersCount = (await this.getOpenOrders('SELL')).length;
