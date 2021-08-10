@@ -27,6 +27,7 @@ export class TradeInfo {
 
     private cryptoPair: { complete: string, src: string, dst: string };
     private options: TradenfoOptions;
+    private currentOpenOrdersCount = 0;
 
     private binanceApi: any;
     private binanceApiAuth: any;
@@ -156,6 +157,20 @@ export class TradeInfo {
         return await this.binanceApiAuth.sell(this.cryptoPair.complete, amountBySrc, priceToSell.toFixed(fixedNum));
     }
 
+    public listenOpenOrderChanges(pollingBySec = 5000) {
+        setInterval(async () => {
+            const openOrdersCount: number = (await this.getOpenOrders()).length;
+
+            if (openOrdersCount < this.currentOpenOrdersCount) {
+                this.currentOpenOrdersCount = openOrdersCount;
+
+                const msgBalances = await this.getBalanceOfThree();
+
+                this.telegram?.sendBroadcastMessage(msgBalances);
+            }
+        }, pollingBySec);
+    }
+
     public async getOpenOrders() {
         const res = await this.binanceApiAuth.openOrders(this.cryptoPair.complete);
 
@@ -180,8 +195,7 @@ BTC: ${ btc.toFixed(8) } (${ btc })
 ETH: ${ eth.toFixed(8) } (${ ethBtc })
 BNB: ${ bnb.toFixed(8) } (${ bnbBtc })
 
-TOTAL(BTC): ${ ((+btc) + (+ethBtc) + (+bnbBtc)).toFixed(8)
-            }
+TOTAL(BTC): ${ ((+btc) + (+ethBtc) + (+bnbBtc)).toFixed(8) }
 `;
 
         return respMsg;
@@ -259,8 +273,9 @@ TOTAL(BTC): ${ ((+btc) + (+ethBtc) + (+bnbBtc)).toFixed(8)
 Sell order created on price ${ priceToBuy } ${ this.cryptoPair.dst } with amount ${ investAmountByDst } ${ this.cryptoPair.dst } `;
 
             const msgBalance = await this.getBalanceOfThree();
+            this.currentOpenOrdersCount = (await this.getOpenOrders()).length;
 
-            this.telegram?.sendBroadcastMessage(msgBuySell + '\n' + msgBalance);
+            this.telegram?.sendBroadcastMessage(msgBuySell + '\n'.repeat(3) + msgBalance);
         } else {
             utils.consoleLog('Buy status is not Filled!');
         }
