@@ -159,7 +159,7 @@ export class TradeInfo {
 
     public listenOpenOrderChanges(pollingBySec = 10000) {
         setInterval(async () => {
-            const openOrdersCount: number = (await this.getOpenOrders()).length;
+            const openOrdersCount: number = (await this.getOpenOrders()).filter((item: any) => item.side === 'SELL').length;
 
             if (openOrdersCount < this.currentOpenOrdersCount) {
                 this.currentOpenOrdersCount = openOrdersCount;

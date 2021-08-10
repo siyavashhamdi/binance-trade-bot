@@ -1,5 +1,6 @@
 import axios from 'axios';
 import utils from './utils';
+import { Telegram } from './telegram';
 import { CalcResult, TradenfoOptions, CandlestickData } from '../type';
 import { CryptoSide, CandlestickType } from '../enum';
 
@@ -26,9 +27,12 @@ export class TradeInfoReverse {
 
     private cryptoPair: { complete: string, src: string, dst: string };
     private options: TradenfoOptions;
+    private currentOpenOrdersCount = 0;
 
     private binanceApi: any;
     private binanceApiAuth: any;
+
+    private telegram?: Telegram;
 
     private nextCheckBuy: Date;
 
@@ -151,6 +155,54 @@ export class TradeInfoReverse {
         const fixedNum = 6;
 
         return await this.binanceApiAuth.buy(this.cryptoPair.complete, amountByDst, priceToBuy.toFixed(fixedNum));
+    }
+
+    public listenOpenOrderChanges(pollingBySec = 10000) {
+        setInterval(async () => {
+            const openOrdersCount: number = (await this.getOpenOrders()).filter((item: any) => item.side === 'BUY').length;
+
+            if (openOrdersCount < this.currentOpenOrdersCount) {
+                this.currentOpenOrdersCount = openOrdersCount;
+
+                const msgBalances = await this.getBalanceOfThree();
+
+                this.telegram?.sendBroadcastMessage(`Open order count changed:\n${ msgBalances }`);
+            }
+        }, pollingBySec);
+    }
+
+    public async getOpenOrders() {
+        const res = await this.binanceApiAuth.openOrders(this.cryptoPair.complete);
+
+        return res;
+    }
+
+    public async getBalanceOfThree() {
+        const balances = await this.binanceApiAuth.balance();
+
+        const eth = (+balances.ETH.available) + (+balances.ETH.onOrder);
+        const btc = (+balances.BTC.available) + (+balances.BTC.onOrder);
+        const bnb = (+balances.BNB.available) + (+balances.BNB.onOrder);
+
+        const priceBaseEthBtc = +(process.env.PRICE_BASE_ETH_BTC || '0');
+        const priceBaseBnbBtc = +(process.env.PRICE_BASE_BNB_BTC || '0');
+
+        const ethBtc = (eth * priceBaseEthBtc).toFixed(8);
+        const bnbBtc = (bnb * priceBaseBnbBtc).toFixed(8);
+
+        const respMsg = `Balances of three important coins:
+BTC: ${ btc.toFixed(8) } (${ btc })
+ETH: ${ eth.toFixed(8) } (${ ethBtc })
+BNB: ${ bnb.toFixed(8) } (${ bnbBtc })
+
+TOTAL(BTC): ${ ((+btc) + (+ethBtc) + (+bnbBtc)).toFixed(8) }
+`;
+
+        return respMsg;
+    }
+
+    public setTelegram(telegram: Telegram) {
+        this.telegram = telegram;
     }
 
     public async orderInstantBuySell(investAmountByUsdt: number, desiredProfitPercentage: number): Promise<CalcResult> {

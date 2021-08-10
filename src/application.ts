@@ -13,12 +13,11 @@ export async function bootstrap() {
     telegram.sendBroadcastMessage('Application started.');
 
     tradeInfoEthBtc.setTelegram(telegram);
+    tradeInfoEthBtcReverse.setTelegram(telegram);
+
     telegram.setTradeInfo(tradeInfoEthBtc);
 
     tradeInfoEthBtc.listenOpenOrderChanges();
-
-    const x = await tradeInfoEthBtc.getOpenOrders();
-    console.log({ x });
 
     setInterval(async () => {
         try {
@@ -27,10 +26,10 @@ export async function bootstrap() {
                 desiredProfitPercentage: 0.05,
             });
 
-            // await tradeInfoEthBtcReverse.orderPlanA({
-            //     priceToSell: 0.002,
-            //     desiredProfitPercentage: 0.05,
-            // });
+            await tradeInfoEthBtcReverse.orderPlanA({
+                priceToSell: 0.002,
+                desiredProfitPercentage: 0.05,
+            });
         } catch (err) {
             utils.consoleLog(JSON.stringify({ err }));
         }
