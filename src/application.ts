@@ -15,23 +15,19 @@ export async function bootstrap() {
     tradeInfoEthBtc.setTelegram(telegram);
     telegram.setTradeInfo(tradeInfoEthBtc);
 
-    const res = await tradeInfoEthBtc.getBalanceOfThree();
+    setInterval(async () => {
+        try {
+            await tradeInfoEthBtc.orderPlanA({
+                priceToBuy: 0.002,
+                desiredProfitPercentage: 0.05,
+            });
 
-    console.log({ res });
-
-    // setInterval(async () => {
-    //     try {
-    //         await tradeInfoEthBtc.orderPlanA({
-    //             priceToBuy: 0.002,
-    //             desiredProfitPercentage: 0.05,
-    //         });
-
-    //         await tradeInfoEthBtcReverse.orderPlanA({
-    //             priceToSell: 0.002,
-    //             desiredProfitPercentage: 0.05,
-    //         });
-    //     } catch (err) {
-    //         utils.consoleLog(JSON.stringify({ err }));
-    //     }
-    // }, 5000);
+            await tradeInfoEthBtcReverse.orderPlanA({
+                priceToSell: 0.002,
+                desiredProfitPercentage: 0.05,
+            });
+        } catch (err) {
+            utils.consoleLog(JSON.stringify({ err }));
+        }
+    }, 5000);
 }
