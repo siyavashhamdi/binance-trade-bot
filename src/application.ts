@@ -15,7 +15,7 @@ export async function bootstrap() {
     tradeInfoEthBtc.setTelegram(telegram);
     telegram.setTradeInfo(tradeInfoEthBtc);
 
-    const res = tradeInfoEthBtc.getBalanceOfThree();
+    const res = await tradeInfoEthBtc.getBalanceOfThree();
 
     console.log({ res });
 
