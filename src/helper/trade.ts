@@ -236,8 +236,8 @@ export class TradeInfo {
 
             utils.consoleLog(`Sell order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
 
-            this.telegram?.sendBroadcastMessage(`Market buy done on price ${ resBuy.fills[0].price }${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty }${ this.cryptoPair.src }
-            Sell order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
+            this.telegram?.sendBroadcastMessage(`Market buy done on price ${ resBuy.fills[0].price }${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty }${ this.cryptoPair.dst }
+Sell order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.dst }`);
         } else {
             utils.consoleLog('Buy status is not Filled!');
         }
