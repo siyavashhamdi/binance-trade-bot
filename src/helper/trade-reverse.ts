@@ -268,10 +268,10 @@ TOTAL: ${ ((+btc) + (+ethBtc) + (+bnbBtc)).toFixed(8) } BTC
 
             await this.buylLimit(objInput.priceToSell, priceToSell);
 
-            utils.consoleLog(`Reverse: Buy order created on price ${ priceToBuy }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
+            utils.consoleLog(`Reverse: Buy order created on price ${ priceToBuy.toFixed(8) }${ this.cryptoPair.dst } with amount ${ investAmountByDst }${ this.cryptoPair.src }`);
 
             let msgSellBuy = `Reverse: Market sell done on price ${ resBuy.fills[0].price } ${ this.cryptoPair.dst } with amount ${ resBuy.cummulativeQuoteQty } ${ this.cryptoPair.dst }
-Buy order created on price ${ priceToSell } ${ this.cryptoPair.dst } with amount ${ investAmountByDst } ${ this.cryptoPair.dst } `;
+Buy order created on price ${ priceToSell.toFixed(8) } ${ this.cryptoPair.dst } with amount ${ investAmountByDst } ${ this.cryptoPair.dst } `;
 
             const msgBalance = await this.getBalanceOfThree();
             this.currentOpenOrdersCount = (await this.getOpenOrders('BUY')).length;
