@@ -24,13 +24,13 @@ export async function bootstrap() {
         try {
             await tradeInfoEthBtc.orderPlanA({
                 priceToBuy: 0.002,
-                desiredProfitPercentage: 0.05,
+                desiredProfitPercentage: 0.06,
             });
 
-            // await tradeInfoEthBtcReverse.orderPlanA({
-            //     priceToSell: 0.002,
-            //     desiredProfitPercentage: 0.05,
-            // });
+            await tradeInfoEthBtcReverse.orderPlanA({
+                priceToSell: 0.002,
+                desiredProfitPercentage: 0.06,
+            });
         } catch (err) {
             utils.consoleLog(JSON.stringify({ err }));
         }
