@@ -22,15 +22,15 @@ export async function bootstrap() {
 
     setInterval(async () => {
         try {
-            // await tradeInfoEthBtc.orderPlanA({
-            //     priceToBuy: 0.002,
-            //     desiredProfitPercentage: 0.05,
-            // });
-
-            await tradeInfoEthBtcReverse.orderPlanA({
-                priceToSell: 0.002,
+            await tradeInfoEthBtc.orderPlanA({
+                priceToBuy: 0.002,
                 desiredProfitPercentage: 0.05,
             });
+
+            // await tradeInfoEthBtcReverse.orderPlanA({
+            //     priceToSell: 0.002,
+            //     desiredProfitPercentage: 0.05,
+            // });
         } catch (err) {
             utils.consoleLog(JSON.stringify({ err }));
         }
