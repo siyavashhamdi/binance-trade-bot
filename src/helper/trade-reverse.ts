@@ -192,11 +192,11 @@ export class TradeInfoReverse {
         const bnbBtc = (bnb * priceBaseBnbBtc).toFixed(8);
 
         const respMsg = `Balances of three important coins:
-BTC: ${ btc.toFixed(8) } (${ btcBtc })
-ETH: ${ eth.toFixed(8) } (${ ethBtc })
-BNB: ${ bnb.toFixed(8) } (${ bnbBtc })
+BTC: ${ btc.toFixed(8) } (${ btcBtc } BTC)
+ETH: ${ eth.toFixed(8) } (${ ethBtc } BTC)
+BNB: ${ bnb.toFixed(8) } (${ bnbBtc } BTC)
 
-TOTAL(BTC): ${ ((+btc) + (+ethBtc) + (+bnbBtc)).toFixed(8) }
+TOTAL: ${ ((+btc) + (+ethBtc) + (+bnbBtc)).toFixed(8) } BTC
 `;
 
         return respMsg;
